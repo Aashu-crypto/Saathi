@@ -6,7 +6,7 @@ import Account from '../../screens/account/Account'
 const AccountStack = () => {
     const Stack=createStackNavigator()
   return (
-<Stack.Navigator>
+<Stack.Navigator screenOptions={{headerShown:false}}>
     <Stack.Screen name={Route.ACCOUNT} component={Account} />
 </Stack.Navigator>
   )

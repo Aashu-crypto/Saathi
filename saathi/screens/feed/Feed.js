@@ -1,12 +1,13 @@
-import React from 'react'
-import { View,Text } from 'react-native'
+import React from "react";
+import { View, Text } from "react-native";
+import HeaderComponent from "../../components/HeaderComponent";
 
 const Feed = () => {
   return (
-<View>
-    <Text>Feed</Text>
-</View>
-  )
-}
+    <View style={{ backgroundColor: "#fff", flex: 1 }}>
+      <HeaderComponent title={"FEED"} />
+    </View>
+  );
+};
 
-export default Feed
+export default Feed;
