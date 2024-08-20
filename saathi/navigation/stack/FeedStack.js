@@ -1,7 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Route } from "../../routes/router";
+
 import Feed from "../../screens/feed/Feed";
+import { Route } from "../../routes";
 const FeedStack = () => {
   const Stack = createStackNavigator();
   return (

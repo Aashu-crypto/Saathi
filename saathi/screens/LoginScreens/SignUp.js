@@ -20,16 +20,19 @@ import { Color, FontFamily } from "../../GlobalStyles";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Route } from "../../routes";
 const { width, height } = Dimensions.get("window");
 
-export default function LoginScreen({ navigation }) {
-  const [phoneNumber, setPhoneNumber] = useState("");
+export default function SignUp({ navigation }) {
+  const [number, setNumber] = useState();
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [userType, setUserType] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loginError, setLoginError] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -64,8 +67,24 @@ export default function LoginScreen({ navigation }) {
           </Text>
 
           <View style={styles.form}>
+            <Text
+              style={{
+                alignSelf: "center",
+                fontSize: 20,
+                color: Color.colorDarkslategray,
+              }}
+            >
+              Create Account
+            </Text>
             <TextInput
-              autoCapitalize="none"
+              style={[styles.input, { borderBottomWidth: 1 }]}
+              placeholder="Enter your name"
+              onChangeText={setFirstName}
+              value={firstName}
+              placeholderTextColor={Color.colorDarkslategray}
+            />
+           
+            <TextInput
               style={[styles.input, { borderBottomWidth: 1 }]}
               placeholder="Email"
               keyboardType="email-address" // Or 'phone-pad' if appropriate
@@ -73,9 +92,19 @@ export default function LoginScreen({ navigation }) {
               value={email}
               placeholderTextColor={Color.colorDarkslategray}
             />
-            {loginError && <Text style={styles.errorText}>{loginError}</Text>}
+            {/* {loginError.error.mail && (
+            <Text style={styles.errorText}>{loginError.error.mail}</Text>
+          )} */}
+            <TextInput
+              style={[styles.input, { borderBottomWidth: 1 }]}
+              placeholder="Phone number"
+              keyboardType="phone-pad" // Or 'phone-pad' if appropriate
+              onChangeText={setNumber}
+              value={number}
+              placeholderTextColor={Color.colorDarkslategray}
+            />
 
-            <KeyboardAvoidingView style={[styles.passwordContainer]}>
+            <View style={[styles.passwordContainer]}>
               <TextInput
                 style={[styles.input, { width: 180 }]}
                 placeholder="Password"
@@ -84,6 +113,11 @@ export default function LoginScreen({ navigation }) {
                 value={password}
                 placeholderTextColor={Color.colorDarkslategray}
               />
+              {loginError && (
+                <Text style={styles.errorText}>
+                  {loginError.error.password}
+                </Text>
+              )}
               <TouchableOpacity onPress={togglePasswordVisibility}>
                 <Ionicons
                   name={!showPassword ? "eye-off-outline" : "eye-outline"}
@@ -91,46 +125,26 @@ export default function LoginScreen({ navigation }) {
                   color="gray"
                 />
               </TouchableOpacity>
-            </KeyboardAvoidingView>
+            </View>
 
-            {!isLoaded ? (
-              <>
-                <TouchableOpacity style={styles.login}>
-                  <Text style={styles.loginText}>Login</Text>
-                </TouchableOpacity>
+            <TouchableOpacity style={styles.login}>
+              <Text style={styles.loginText}>Sign Up</Text>
+            </TouchableOpacity>
 
-                <Pressable
-                  onPress={() => {
-                    navigation.navigate(Route.SIGNUP);
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.termsLink,
-                      { textAlign: "center", marginTop: 15 },
-                    ]}
-                  >
-                    Create Account
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    navigation.navigate(Route.FORGETPASSWORD);
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.termsLink,
-                      { textAlign: "center", marginTop: 15 },
-                    ]}
-                  >
-                    Forgot Password?
-                  </Text>
-                </Pressable>
-              </>
-            ) : (
-              <ContentLoader />
-            )}
+            <Pressable
+              onPress={() => {
+                navigation.navigate(Route.LOGIN);
+              }}
+            >
+              <Text
+                style={[
+                  styles.termsLink,
+                  { textAlign: "center", marginTop: 5 },
+                ]}
+              >
+                Already Have a Account?
+              </Text>
+            </Pressable>
           </View>
         </View>
       </SafeAreaView>

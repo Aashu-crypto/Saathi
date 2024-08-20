@@ -18,6 +18,7 @@ import Icon from "react-native-vector-icons/Feather";
 import { Color, FontFamily } from "../../GlobalStyles";
 import { StackActions } from "@react-navigation/native";
 import { Route } from "../../routes/router";
+import { CommonActions } from "@react-navigation/native";
 import FeedStack from "../../navigation/stack/FeedStack";
 const { width, height } = Dimensions.get("window");
 
@@ -39,8 +40,13 @@ export default function OTPVerificationScreen({ navigation }) {
 
   const handleVerifyOtp = () => {
     if (otp.join("").length === 6) {
-      // Navigate to the next screen (e.g., Home screen)
-      navigation.dispatch(StackActions.replace(Route.BOTTOM_TAB));
+      // Reset the navigation stack to the BottomTab screen
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: Route.BOTTOM_TAB }],
+        })
+      );
     } else {
       Alert.alert("Invalid OTP", "Please enter a valid 6-digit OTP.");
     }

@@ -1,15 +1,15 @@
-import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
-import { Route } from '../../routes/router'
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import Account from '../../screens/account/Account'
+import Account from "../../screens/account/Account";
+import { Route } from "../../routes";
 const AccountStack = () => {
-    const Stack=createStackNavigator()
+  const Stack = createStackNavigator();
   return (
-<Stack.Navigator screenOptions={{headerShown:false}}>
-    <Stack.Screen name={Route.ACCOUNT} component={Account} />
-</Stack.Navigator>
-  )
-}
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={Route.ACCOUNT} component={Account} />
+    </Stack.Navigator>
+  );
+};
 
-export default AccountStack
+export default AccountStack;
