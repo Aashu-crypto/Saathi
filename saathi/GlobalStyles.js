@@ -18,7 +18,7 @@ export const Color = {
   colorGray_100: '#848484',
   colorSilver: '#c4c4c4',
   colorGray: '#828282',
-  appDefaultColor: '#5E4DB0',
+  appDefaultColor: '#034F75',
   colorGrayLight: '#C4C4C4',
   colorGrayNormal: '#4C4E64',
   lightOrange: '#F7F5FE',

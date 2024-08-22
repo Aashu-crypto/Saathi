@@ -22,13 +22,15 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Route } from "../../routes";
 const { width, height } = Dimensions.get("window");
-
+import { useDispatch } from "react-redux";
+import { screen } from "../../Redux/Slice/screenNameSlice";
 export default function LoginScreen({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [loginError, setLoginError] = useState(null);
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -51,7 +53,7 @@ export default function LoginScreen({ navigation }) {
       }}
     >
       <SafeAreaView style={styles.container}>
-        <StatusBar style="dark" backgroundColor="#cf7234" />
+        <StatusBar style="dark" />
         <LinearGradient
           colors={[Color.appDefaultColor, Color.lightOrange]}
           style={styles.headerContainer}
@@ -113,26 +115,24 @@ export default function LoginScreen({ navigation }) {
                     Create Account
                   </Text>
                 </Pressable>
-                <Pressable
-                  onPress={() => {
-                    navigation.navigate(Route.FORGETPASSWORD);
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.termsLink,
-                      { textAlign: "center", marginTop: 15 },
-                    ]}
-                  >
-                    Forgot Password?
-                  </Text>
-                </Pressable>
               </>
             ) : (
               <ContentLoader />
             )}
           </View>
         </View>
+        <Pressable
+          onPress={() => {
+            dispatch(screen(Route.MAIN));
+          }}
+        >
+          <Ionicons
+            name={"close-circle-outline"}
+            size={35}
+            color={Color.appDefaultColor}
+          />
+          <Text style={{ fontSize: 6, alignSelf: "center" }}>close</Text>
+        </Pressable>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

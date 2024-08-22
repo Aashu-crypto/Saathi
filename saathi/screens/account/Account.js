@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
 const Account = () => {
-  const profileOptionsData = [{ title: "Subscribe" }, { title: "About us" }];
+  const profileOptionsData = [{ title: "Contact Us" }, { title: "About us" }];
   const dispatch = useDispatch();
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>

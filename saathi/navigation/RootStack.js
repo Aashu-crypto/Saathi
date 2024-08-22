@@ -1,6 +1,5 @@
 import React from "react";
-import { View } from "react-native";
-
+import { View, Text } from "react-native";
 
 import { useSelector } from "react-redux";
 
@@ -14,7 +13,7 @@ const RootStack = () => {
     case Route.MAIN:
       return <BottomTab />;
     case Route.LOGIN:
-      return <LoginStack/>
+      return <LoginStack />;
 
     default:
       return <BottomTab />;

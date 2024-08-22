@@ -21,7 +21,8 @@ import { StatusBar } from "expo-status-bar";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width, height } = Dimensions.get("window");
-
+import { useDispatch } from "react-redux";
+import { Route } from "../../routes";
 export default function SignUp({ navigation }) {
   const [number, setNumber] = useState();
   const [email, setEmail] = useState("");
@@ -31,6 +32,7 @@ export default function SignUp({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [userType, setUserType] = useState(false);
+  const dispatch = useDispatch();
   const [isLoaded, setIsLoaded] = useState(false);
   const [loginError, setLoginError] = useState(null);
   const togglePasswordVisibility = () => {
@@ -54,7 +56,7 @@ export default function SignUp({ navigation }) {
       }}
     >
       <SafeAreaView style={styles.container}>
-        <StatusBar style="dark" backgroundColor="#cf7234" />
+        <StatusBar style="dark" />
         <LinearGradient
           colors={[Color.appDefaultColor, Color.lightOrange]}
           style={styles.headerContainer}
@@ -83,7 +85,7 @@ export default function SignUp({ navigation }) {
               value={firstName}
               placeholderTextColor={Color.colorDarkslategray}
             />
-           
+
             <TextInput
               style={[styles.input, { borderBottomWidth: 1 }]}
               placeholder="Email"
@@ -147,6 +149,18 @@ export default function SignUp({ navigation }) {
             </Pressable>
           </View>
         </View>
+        <Pressable
+          onPress={() => {
+            dispatch(screen(Route.MAIN));
+          }}
+        >
+          <Ionicons
+            name={"close-circle-outline"}
+            size={35}
+            color={Color.appDefaultColor}
+          />
+          <Text style={{ fontSize: 6, alignSelf: "center" }}>close</Text>
+        </Pressable>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

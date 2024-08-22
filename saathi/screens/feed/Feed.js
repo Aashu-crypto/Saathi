@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  ImageBackground,
 } from "react-native";
 import HeaderComponent from "../../components/HeaderComponent";
 import Icon from "@expo/vector-icons/Ionicons";
@@ -14,9 +15,24 @@ import { Color, FontFamily, height, width } from "../../GlobalStyles";
 import cityRide from "../../assets/imgs/cityride.png";
 import rental from "../../assets/imgs/rental.png";
 import rides from "../../assets/imgs/rides.png";
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 import airportRides from "../../assets/imgs/airpotrides.png";
 import scheduleRides from "../../assets/imgs/schedulerides.png";
+import Cooking from "../../assets/imgs/cooking.svg";
+import Packages from "../../components/feedComponents/Packages";
+import ServicesTaken from "../../components/feedComponents/ServicesTaken";
+import { StatusBar } from "expo-status-bar";
+import ServiceSelector from "../service/Service";
 const Feed = () => {
+  const currentRef = useRef(0);
+  const flatListRef = useRef(null);
+  const currentIndex = useRef(0);
   const testimonials = [
     {
       id: "1",
@@ -48,7 +64,7 @@ const Feed = () => {
       description: `• 1 hour call every week with call records in "My Feed"\n• 1 house visit for health check and well-being\n• Digital media uploaded to "My Feed"\n`,
       price: "$30/m (Rs. 2500/m)",
       icon: "star-outline",
-      colors: ["#6a11cb", "#2575fc"],
+      colors: ["#FFD700", "#2575fc"],
     },
     {
       id: "2",
@@ -75,6 +91,17 @@ const Feed = () => {
       colors: ["#f4c4f3", "#fc67fa"],
     },
   ];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      currentIndex.current = (currentIndex.current + 1) % testimonials.length;
+      flatListRef.current.scrollToIndex({
+        index: currentIndex.current,
+        animated: true,
+      });
+    }, 2500); // Auto-slide interval in milliseconds
+
+    return () => clearInterval(interval); // Clear the interval on unmount
+  }, []);
   const exploreOptions = [
     { name: "City Rides", icon: cityRide },
     { name: "Home Visit", icon: rental },
@@ -83,47 +110,73 @@ const Feed = () => {
     { name: "Errands", icon: scheduleRides },
   ];
   const SubscriptionCard = ({ item }) => (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: item.colors[0] }]}>
       <Text style={styles.title}>{item.title} Package</Text>
       <Text style={styles.description}>{item.description}</Text>
       <Text style={styles.price}>{item.price}</Text>
     </View>
   );
   const TestimonialItem = ({ item }) => (
-    <View style={styles.testimonialContainer}>
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      <View style={styles.textContainer}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.feedback}>"{item.feedback}"</Text>
-        <View style={styles.ratingContainer}>
-          {Array.from({ length: item.rating }).map((_, index) => (
-            <Icon key={index} name="star" size={20} color="#FFD700" />
-          ))}
+    <View style={{ flex: 1, width: width }}>
+      <View style={styles.testimonialContainer}>
+        <Image source={{ uri: item.avatar }} style={styles.avatar} />
+        <View style={styles.textContainer}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.feedback}>"{item.feedback}"</Text>
+          <View style={styles.ratingContainer}>
+            {Array.from({ length: item.rating }).map((_, index) => (
+              <Icon key={index} name="star" size={20} color="#FFD700" />
+            ))}
+          </View>
         </View>
       </View>
     </View>
   );
   return (
     <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
-      <HeaderComponent title={"FEED"} />
+      <StatusBar style="dark" />
+      <HeaderComponent title={"Saathi"} />
       <View>
-        <Text style={styles.mainTitle}>Testimonials</Text>
-        <FlatList
-          data={testimonials}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <TestimonialItem item={item} />}
-          contentContainerStyle={styles.listContainer}
-        />
+        <Text
+          style={{
+            textAlign: "center",
+            paddingHorizontal: 15,
+            paddingBottom: 15,
+            fontWeight: "400",
+            fontSize: 14,
+          }}
+        >
+          A companion for you and your loved ones
+        </Text>
+        {/* <View
+        style={{ gap: 10, padding: 10 }}
+      >
+        <Text style={{ textAlign: "center", fontWeight: "800", fontSize: 20 }}>
+          Our Mission
+        </Text>
+        <Text
+          style={{
+            textAlign: "center",
+            paddingHorizontal: 15,
+            paddingBottom: 15,
+            fontWeight: "500",
+          }}
+        >
+          Saathi is dedicated to supporting families by providing services to
+          loved ones in semi-urban or rural areas, offering everything from
+          companionship to essential care like doctor visits and home
+          assistance, ensuring they are well cared for even when you're far
+          away.
+        </Text>
+      </View> */}
       </View>
-      <Text style={styles.mainTitle}>Checkout Our Packages</Text>
-      <FlatList
-        data={packages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <SubscriptionCard item={item} />}
-        contentContainerStyle={styles.listContainer}
-      />
+
+      <Packages />
+      <ServicesTaken />
+
       <Text style={styles.mainTitle}>Explore our services</Text>
-      <View style={styles.exploreButtons}>
+      
+      {/* <View style={styles.exploreButtons}>
         {exploreOptions.map((option, index) => (
           <TouchableOpacity key={index} style={styles.exploreButton}>
             <Image
@@ -137,6 +190,26 @@ const Feed = () => {
             <Text style={styles.exploreButtonText}>{option.name}</Text>
           </TouchableOpacity>
         ))}
+      </View> */}
+      <ServiceSelector/>
+
+      <View>
+        <Text style={styles.mainTitle}>Testimonials</Text>
+        <FlatList
+          data={testimonials}
+          ref={flatListRef}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <TestimonialItem item={item} />}
+          contentContainerStyle={styles.listContainer}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+        />
+        {/* <View style={{ flexDirection: "row", alignSelf: "center" }}>
+          {testimonials.map((item, index) => {
+            return <View style={styles.dot} />;
+          })}
+        </View> */}
       </View>
     </ScrollView>
   );
@@ -145,12 +218,12 @@ const Feed = () => {
 export default Feed;
 const styles = StyleSheet.create({
   listContainer: {
-    paddingHorizontal: 20,
     paddingVertical: 10,
+    margin: 5,
   },
   testimonialContainer: {
     flexDirection: "row",
-    padding: 15,
+    padding: 20,
     marginVertical: 10,
     backgroundColor: Color.lightOrange,
     borderRadius: 10,
@@ -159,6 +232,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     elevation: 5,
+    width: "95%",
+    marginHorizontal: 5,
   },
   avatar: {
     width: 60,
@@ -198,6 +273,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     elevation: 3,
+    marginHorizontal: 5,
   },
   title: {
     fontSize: 18,
@@ -257,5 +333,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
+  },
+  dot: {
+    height: 10,
+    width: 10,
+    borderRadius: 5,
+    backgroundColor: "#595959",
+    margin: 8,
   },
 });

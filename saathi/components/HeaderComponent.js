@@ -18,7 +18,6 @@ const HeaderComponent = ({ title }) => {
         }}
       >
         <Text style={styles.read}>{title}</Text>
-        <Pressable></Pressable>
       </View>
     </View>
   );
@@ -28,14 +27,16 @@ export default HeaderComponent;
 
 const styles = StyleSheet.create({
   feedHeader: {
-    height: 100,
+    height: 80,
     width: width,
-    backgroundColor: "#fff",
     paddingHorizontal: 20,
+    
   },
   read: {
     color: Color.colorDarkslategray,
     fontWeight: "700",
-    fontSize: 25,
+    fontSize: 27,
+    letterSpacing:2,
+    color: "#034F75",
   },
 });
