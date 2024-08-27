@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import Animated, {
   Extrapolate,
   interpolate,
@@ -48,7 +48,9 @@ const Packages = () => {
       colors: ["#FFD54F", "#FFB300"], // Soft gold and amber
     },
   ];
-
+  const handlePress = () => {
+    Alert.alert("Payment Gateway will Open");
+  };
   function Item({ index, scrollY, item }) {
     const itemScaleStyle = useAnimatedStyle(() => {
       const input = [
@@ -75,7 +77,7 @@ const Packages = () => {
           <Text style={styles.price}>{item.price}</Text>
           <View style={styles.divider} />
           <Text style={styles.description}>{item.description}</Text>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handlePress}>
             <Text style={styles.buttonText}>Choose Plan</Text>
           </TouchableOpacity>
         </View>
@@ -148,18 +150,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     marginBottom: 10,
-    borderWidth:1,
-    borderColor:'#fff',
-    paddingHorizontal:25,
-    borderRadius:15,
-    paddingVertical:5
+    borderWidth: 1,
+    borderColor: "#fff",
+    paddingHorizontal: 25,
+    borderRadius: 15,
+    paddingVertical: 5,
   },
   price: {
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
     marginBottom: 10,
-    textAlign:'center'
+    textAlign: "center",
   },
   divider: {
     height: 1,

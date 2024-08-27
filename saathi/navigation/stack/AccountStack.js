@@ -3,11 +3,13 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Account from "../../screens/account/Account";
 import { Route } from "../../routes";
+import AboutUs from "../../screens/account/setting/AboutUs";
 const AccountStack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name={Route.ACCOUNT} component={Account} />
+      <Stack.Screen name={Route.ABOUTUS} component={AboutUs}/>
     </Stack.Navigator>
   );
 };

@@ -27,16 +27,15 @@ export default HeaderComponent;
 
 const styles = StyleSheet.create({
   feedHeader: {
-    height: 80,
+    height: 90,
     width: width,
     paddingHorizontal: 20,
-    
   },
   read: {
     color: Color.colorDarkslategray,
     fontWeight: "700",
     fontSize: 27,
-    letterSpacing:2,
+    letterSpacing: 2,
     color: "#034F75",
   },
 });

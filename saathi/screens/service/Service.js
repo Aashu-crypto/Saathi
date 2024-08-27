@@ -9,15 +9,16 @@ import {
   TextInput,
   Button,
   SafeAreaView,
+  ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Color, width } from "../../GlobalStyles";
 
 const availableServices = [
-  { id: "1", service: "City Ride", icon: "car-outline" },
-  { id: "2", service: "Home Visit", icon: "home-outline" },
-  { id: "3", service: "Grocery Errand", icon: "cart-outline" },
-  { id: "4", service: "Pharmacy Errand", icon: "medkit-outline" },
+  { id: "1", service: "Destination Drive", icon: "car-outline" },
+  { id: "2", service: "House Check", icon: "home-outline" },
+  { id: "3", service: " Errand Run", icon: "cart-outline" },
 ];
 
 const ServiceSelector = () => {
@@ -165,6 +166,19 @@ const ServiceSelector = () => {
           </View>
         </Modal>
       )}
+      <View>
+        {/* <ImageBackground
+          source={require("../../assets/imgs/elder.png")}
+          style={{
+            height: 200,
+            width: width / 2,
+            resizeMode: "contain",
+            alignSelf: "center",
+          }}
+        >
+         
+        </ImageBackground> */}
+      </View>
     </SafeAreaView>
   );
 };
@@ -176,6 +190,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
+    marginTop: 10,
   },
   title: {
     fontSize: 24,
@@ -200,7 +215,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   serviceIconContainer: {
-    backgroundColor: "#007bff",
+    backgroundColor: Color.appDefaultColor,
     padding: 10,
     borderRadius: 10,
     marginRight: 15,

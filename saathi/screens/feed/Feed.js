@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -29,6 +29,9 @@ import Packages from "../../components/feedComponents/Packages";
 import ServicesTaken from "../../components/feedComponents/ServicesTaken";
 import { StatusBar } from "expo-status-bar";
 import ServiceSelector from "../service/Service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Accordion from "../../components/Accordion";
+import { useFocusEffect } from '@react-navigation/native';
 const Feed = () => {
   const currentRef = useRef(0);
   const flatListRef = useRef(null);
@@ -91,6 +94,15 @@ const Feed = () => {
       colors: ["#f4c4f3", "#fc67fa"],
     },
   ];
+  const [mail, setMail] = useState();
+  useEffect(() => {
+    const fetch = async () => {
+      const mail = await AsyncStorage.getItem("Email");
+      console.log("My Mail", mail);
+      setMail(mail);
+    };
+    fetch();
+  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       currentIndex.current = (currentIndex.current + 1) % testimonials.length;
@@ -170,12 +182,10 @@ const Feed = () => {
         </Text>
       </View> */}
       </View>
+      {mail?.length && <ServicesTaken />}
 
       <Packages />
-      <ServicesTaken />
-
-      <Text style={styles.mainTitle}>Explore our services</Text>
-      
+      <Accordion />
       {/* <View style={styles.exploreButtons}>
         {exploreOptions.map((option, index) => (
           <TouchableOpacity key={index} style={styles.exploreButton}>
@@ -191,7 +201,7 @@ const Feed = () => {
           </TouchableOpacity>
         ))}
       </View> */}
-      <ServiceSelector/>
+      <ServiceSelector />
 
       <View>
         <Text style={styles.mainTitle}>Testimonials</Text>
@@ -211,6 +221,7 @@ const Feed = () => {
           })}
         </View> */}
       </View>
+     
     </ScrollView>
   );
 };
@@ -248,7 +259,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: Color.appDefaultColor,
   },
   feedback: {
     fontSize: 14,

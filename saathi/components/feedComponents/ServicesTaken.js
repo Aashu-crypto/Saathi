@@ -8,7 +8,7 @@ const ServicesTaken = () => {
       id: "1",
       service: "City Ride",
       description: "A ride to the city center and back.",
-      status: "Completed",
+      status: "Pending",
       date: "2024-08-21",
     },
     {
@@ -29,7 +29,7 @@ const ServicesTaken = () => {
       id: "4",
       service: "Pharmacy Errand",
       description: "Errand to pick up medication from the pharmacy.",
-      status: "Pending",
+      status: "Completed",
       date: "2024-08-23",
     },
     {

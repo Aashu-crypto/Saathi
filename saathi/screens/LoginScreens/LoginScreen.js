@@ -97,7 +97,13 @@ export default function LoginScreen({ navigation }) {
 
             {!isLoaded ? (
               <>
-                <TouchableOpacity style={styles.login}>
+                <TouchableOpacity
+                  style={styles.login}
+                  onPress={() => {
+                    AsyncStorage.setItem("Email", email);
+                    dispatch(screen(Route.MAIN));
+                  }}
+                >
                   <Text style={styles.loginText}>Login</Text>
                 </TouchableOpacity>
 

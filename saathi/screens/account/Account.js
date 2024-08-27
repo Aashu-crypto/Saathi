@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,9 +14,24 @@ import { User } from "../../components/UserPic";
 import { useDispatch } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
-const Account = () => {
-  const profileOptionsData = [{ title: "Contact Us" }, { title: "About us" }];
+const Account = ({ navigation }) => {
+  const profileOptionsData = [
+    { title: "Contact Us" },
+    { title: "About us" },
+    { title: "How we do things" },
+    { title: "My Services" },
+  ];
+  const [mail, setMail] = useState();
   const dispatch = useDispatch();
+  useEffect(() => {
+    const fetch = async () => {
+      const mail = await AsyncStorage.getItem("Email");
+      console.log("My Mail", mail);
+      setMail(mail);
+    };
+    fetch();
+  }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <HeaderComponent title={"Profile"} />
@@ -31,53 +46,63 @@ const Account = () => {
           }}
         >
           <User />
-          <Pressable
-            style={{
-              backgroundColor: Color.lightpurple,
-              borderRadius: 15,
-              borderColor: Color.appDefaultColor,
-              color: Color.colorDarkslategray,
-              borderWidth: 1,
-              padding: 15,
-            }}
-            onPress={() => {
-              dispatch(screen(Route.LOGIN));
-            }}
-          >
-            <Text
+          {mail?.length ? (
+            <Text>{mail}</Text>
+          ) : (
+            <Pressable
               style={{
-                fontSize: 16,
-                fontWeight: "400",
-                width: width / 1.8,
-                textAlign: "center",
-                fontFamily: FontFamily.poppinsRegular,
-                textDecorationLine: "underline",
+                backgroundColor: Color.lightpurple,
+                borderRadius: 15,
+                borderColor: Color.appDefaultColor,
+                color: Color.colorDarkslategray,
+                borderWidth: 1,
+                padding: 15,
+              }}
+              onPress={() => {
+                dispatch(screen(Route.LOGIN));
               }}
             >
-              Sign In/Sign Up
-            </Text>
-          </Pressable>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "400",
+                  width: width / 1.8,
+                  textAlign: "center",
+                  fontFamily: FontFamily.poppinsRegular,
+                  textDecorationLine: "underline",
+                }}
+              >
+                Sign In/Sign Up
+              </Text>
+            </Pressable>
+          )}
         </View>
+        <Text style={styles.setting}>Settings</Text>
         {profileOptionsData.map((item, index) => (
           <View key={item.title}>
             <TouchableOpacity
               onPress={() => {
-                handleProfile(item);
+                navigation.navigate(Route.ABOUTUS);
               }}
             >
               <View style={styles.titleView}>
                 <Text style={styles.titleText}>{item.title}</Text>
               </View>
             </TouchableOpacity>
+            <View style={{ borderWidth: 0.5 }} />
           </View>
         ))}
-        <Pressable
+        <Pressable onPress={() => AsyncStorage.clear()}>
+          <Text style={[styles.titleText,{padding:5}]}>Logout</Text>
+        </Pressable>
+
+        {/* <Pressable
           onPress={() => {
             AsyncStorage.removeItem("number");
           }}
         >
           <Text>Logout</Text>
-        </Pressable>
+        </Pressable> */}
       </ScrollView>
     </View>
   );
@@ -106,7 +131,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: "500",
+    fontWeight: "400",
     fontFamily: FontFamily.poppinsRegular,
     color: Color.colorDarkslategray,
   },
