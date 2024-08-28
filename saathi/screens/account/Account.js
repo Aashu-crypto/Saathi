@@ -17,9 +17,10 @@ import { Route } from "../../routes";
 const Account = ({ navigation }) => {
   const profileOptionsData = [
     { title: "Contact Us" },
-    { title: "About us" },
+    { title: "About us" ,route:Route.ABOUTUS},
     { title: "How we do things" },
-    { title: "My Services" },
+    { title: "Your Saathi", route: Route.YOURSAATHI },
+    { title: "Your Packages", route: Route.YOURPACKAGES },
   ];
   const [mail, setMail] = useState();
   const dispatch = useDispatch();
@@ -82,7 +83,9 @@ const Account = ({ navigation }) => {
           <View key={item.title}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate(Route.ABOUTUS);
+                if (item.route) {
+                  navigation.navigate(item.route);
+                }
               }}
             >
               <View style={styles.titleView}>
@@ -93,7 +96,7 @@ const Account = ({ navigation }) => {
           </View>
         ))}
         <Pressable onPress={() => AsyncStorage.clear()}>
-          <Text style={[styles.titleText,{padding:5}]}>Logout</Text>
+          <Text style={[styles.titleText, { padding: 5 }]}>Logout</Text>
         </Pressable>
 
         {/* <Pressable

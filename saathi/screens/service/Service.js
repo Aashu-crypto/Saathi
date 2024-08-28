@@ -9,21 +9,43 @@ import {
   TextInput,
   Button,
   SafeAreaView,
-  ImageBackground,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Color, width } from "../../GlobalStyles";
 
 const availableServices = [
-  { id: "1", service: "Destination Drive", icon: "car-outline" },
-  { id: "2", service: "House Check", icon: "home-outline" },
-  { id: "3", service: " Errand Run", icon: "cart-outline" },
+  {
+    id: "1",
+    service: "Destination Drive",
+    icon: "car-outline",
+    cost: "$40/m (Rs. 3000)",
+    details:
+      "Each Destination Drive provided at $40 (Rs. 3000) – Total of less than 3 hours and limited to 2 patrons; Driving done in a small sedan so luggage should be appropriate. No more than 2 people allowed. Each extra person will be a $10 (Rs. 800) extra charge; Driving hours between 7 am and 10 pm. Surge pricing (1.5x basic charge applied outside the normal driving hours); For larger cars, an extra fixed levy of $20 (Rs. 1600) applied. Each extra hour of driving will be charged at $15 (Rs. 1200).",
+  },
+  {
+    id: "2",
+    service: "House Check",
+    icon: "home-outline",
+    cost: "$10/m (Rs. 800)",
+    details:
+      "Each extra house check provided at $10 (Rs. 800). House checks will be done during normal business hours (between 10 am and 6 pm only). Any house check done outside of business hours will incur a Surge pricing charge (1.5x basic charge).",
+  },
+  {
+    id: "3",
+    service: "Errand Run",
+    icon: "cart-outline",
+    cost: "$20/m (Rs. 1500)",
+    details:
+      "Each errand run provided at $20 (Rs. 1500) – Total of less than 2 hours.",
+  },
 ];
 
 const ServiceSelector = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [confirmBookingVisible, setConfirmBookingVisible] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [patronName, setPatronName] = useState("");
@@ -44,12 +66,13 @@ const ServiceSelector = () => {
   const handleConfirm = () => {
     // Process the service booking with the entered data
     console.log({
-      service: selectedService,
+      service: selectedService.service,
       date,
       patronName,
       address,
       mobileNumber,
     });
+    setConfirmBookingVisible(false);
     setModalVisible(false);
     // Reset inputs
     setPatronName("");
@@ -59,13 +82,13 @@ const ServiceSelector = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Select a Service</Text>
+      <Text style={styles.title}>Request a Service</Text>
       <FlatList
         data={availableServices}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.serviceItem}
-            onPress={() => handleServiceSelect(item.service)}
+            onPress={() => handleServiceSelect(item)}
           >
             <View style={styles.serviceIconContainer}>
               <Ionicons name={item.icon} size={24} color="white" />
@@ -87,7 +110,54 @@ const ServiceSelector = () => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Schedule {selectedService}</Text>
+              <Text style={styles.modalTitle}>{selectedService.service}</Text>
+              <Text style={styles.modalCost}>Cost: {selectedService.cost}</Text>
+
+              <ScrollView style={styles.modalDetailsContainer} showsVerticalScrollIndicator={false}>
+                <Text style={styles.modalDetails}>
+                  {selectedService.details}
+                </Text>
+              </ScrollView>
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setConfirmBookingVisible(true);
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      { color: Color.appDefaultColor },
+                    ]}
+                  >
+                    Proceed to Booking
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Text style={[styles.buttonText, { color: "black" }]}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {confirmBookingVisible && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={confirmBookingVisible}
+          onRequestClose={() => setConfirmBookingVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>
+                Schedule {selectedService.service}
+              </Text>
 
               <Text style={styles.modalDescription}>
                 Please fill in the details below to book the service.
@@ -149,36 +219,27 @@ const ServiceSelector = () => {
               )}
 
               <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={[styles.button, styles.confirmButton]}
-                  onPress={handleConfirm}
-                >
-                  <Text style={styles.buttonText}>Confirm</Text>
+                <TouchableOpacity onPress={handleConfirm}>
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      { color: Color.appDefaultColor },
+                    ]}
+                  >
+                    Confirm Booking
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.button, styles.cancelButton]}
-                  onPress={() => setModalVisible(false)}
+                 
+                  onPress={() => setConfirmBookingVisible(false)}
                 >
-                  <Text style={styles.buttonText}>Cancel</Text>
+                  <Text style={[styles.buttonText, { color: "black" }]}>Cancel</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
       )}
-      <View>
-        {/* <ImageBackground
-          source={require("../../assets/imgs/elder.png")}
-          style={{
-            height: 200,
-            width: width / 2,
-            resizeMode: "contain",
-            alignSelf: "center",
-          }}
-        >
-         
-        </ImageBackground> */}
-      </View>
     </SafeAreaView>
   );
 };
@@ -229,24 +290,42 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker background for better focus on the modal
   },
   modalContent: {
-    width: "90%",
+    width: "85%", // Slightly narrower for a more compact look
     backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
+    borderRadius: 20, // Rounded corners for a softer appearance
+    padding: 25, // More padding for spacious layout
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 }, // More pronounced shadow for depth
     shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowRadius: 10, // Soft shadow for a polished look
+    elevation: 10,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24, // Larger font for the title
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 15, // More spacing below the title
     textAlign: "center",
+    color: "#333", // Darker text color for better readability
+  },
+  modalCost: {
+    fontSize: 18, // Slightly larger cost text
+    color: "#666",
+    marginBottom: 20, // Extra space below cost to separate it from details
+    textAlign: "center",
+    fontWeight:'600'
+  },
+  modalDetailsContainer: {
+    maxHeight: 150, // Constrain height to ensure it doesn’t overflow
+    marginBottom: 20, // Space between details and buttons
+  },
+  modalDetails: {
+    fontSize: 16, // Increased font size for better readability
+    color: "#555", // Softer color for details
+    textAlign: "justify", // Justify text for a clean edge
+    lineHeight: 24, // Line height for improved readability
   },
   modalDescription: {
     fontSize: 14,
@@ -287,20 +366,20 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    padding: 10,
-    borderRadius: 5,
+    padding: 5, // Slightly larger padding for better tap target
+    borderRadius: 10, // Rounded corners for buttons
     alignItems: "center",
     marginHorizontal: 5,
   },
   confirmButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: Color.appDefaultColor, // Professional green for confirmation
   },
   cancelButton: {
-    backgroundColor: "#dc3545",
+    backgroundColor: "black", // Professional red for cancellation
   },
   buttonText: {
-    color: "white",
-    fontSize: 16,
+    color: "black",
+    fontSize: 17,
     fontWeight: "bold",
   },
 });

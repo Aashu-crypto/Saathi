@@ -54,17 +54,16 @@ export default function LoginScreen({ navigation }) {
     >
       <SafeAreaView style={styles.container}>
         <StatusBar style="dark" />
-        <LinearGradient
+        <View
           colors={[Color.appDefaultColor, Color.lightOrange]}
           style={styles.headerContainer}
         >
           <Text style={styles.headerText}>Saathi</Text>
-        </LinearGradient>
-        <View style={styles.inputContainer}>
           <Text style={styles.title}>
             A companion for you and your loved ones
           </Text>
-
+        </View>
+        <View style={styles.inputContainer}>
           <View style={styles.form}>
             <TextInput
               autoCapitalize="none"
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     height: height * 0.3,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     alignSelf: "center",
     textAlign: "center",
     width: "70%",
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 32,
     maxWidth: "80%",
-    color: "#ffffff",
+    color: Color.appDefaultColor,
     textAlign: "center",
     fontFamily: FontFamily.poppinsRegular,
     fontWeight: "600",

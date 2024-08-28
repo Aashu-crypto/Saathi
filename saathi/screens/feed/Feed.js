@@ -31,7 +31,7 @@ import { StatusBar } from "expo-status-bar";
 import ServiceSelector from "../service/Service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Accordion from "../../components/Accordion";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 const Feed = () => {
   const currentRef = useRef(0);
   const flatListRef = useRef(null);
@@ -75,7 +75,6 @@ const Feed = () => {
       description: `• 1 hour call every week with call records in "My Feed"\n• 2 house visits for health check and well-being\n• Upto 2 hours of running errands\n• Digital media uploaded to "My Feed"\n`,
       price: "$40/m (Rs. 3500/m)",
       icon: "medal-outline",
-      colors: ["#ff9966", "#ff5e62"],
     },
     {
       id: "3",
@@ -183,8 +182,8 @@ const Feed = () => {
       </View> */}
       </View>
       {mail?.length && <ServicesTaken />}
-
-      <Packages />
+      {!mail?.length && <Packages />}
+      
       <Accordion />
       {/* <View style={styles.exploreButtons}>
         {exploreOptions.map((option, index) => (
@@ -202,26 +201,26 @@ const Feed = () => {
         ))}
       </View> */}
       <ServiceSelector />
-
-      <View>
-        <Text style={styles.mainTitle}>Testimonials</Text>
-        <FlatList
-          data={testimonials}
-          ref={flatListRef}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <TestimonialItem item={item} />}
-          contentContainerStyle={styles.listContainer}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-        />
-        {/* <View style={{ flexDirection: "row", alignSelf: "center" }}>
+      {!mail?.length && (
+        <View>
+          <Text style={styles.mainTitle}>Testimonials</Text>
+          <FlatList
+            data={testimonials}
+            ref={flatListRef}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <TestimonialItem item={item} />}
+            contentContainerStyle={styles.listContainer}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+          />
+          {/* <View style={{ flexDirection: "row", alignSelf: "center" }}>
           {testimonials.map((item, index) => {
             return <View style={styles.dot} />;
           })}
         </View> */}
-      </View>
-     
+        </View>
+      )}
     </ScrollView>
   );
 };

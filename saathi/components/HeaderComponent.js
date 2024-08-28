@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
     height: 90,
     width: width,
     paddingHorizontal: 20,
+    backgroundColor:'#fff'
   },
   read: {
     color: Color.colorDarkslategray,

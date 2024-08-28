@@ -23,6 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width, height } = Dimensions.get("window");
 import { useDispatch } from "react-redux";
 import { Route } from "../../routes";
+import { screen } from "../../Redux/Slice/screenNameSlice";
 export default function SignUp({ navigation }) {
   const [number, setNumber] = useState();
   const [email, setEmail] = useState("");
@@ -57,23 +58,23 @@ export default function SignUp({ navigation }) {
     >
       <SafeAreaView style={styles.container}>
         <StatusBar style="dark" />
-        <LinearGradient
+        <View
           colors={[Color.appDefaultColor, Color.lightOrange]}
           style={styles.headerContainer}
         >
           <Text style={styles.headerText}>Saathi</Text>
-        </LinearGradient>
-        <View style={styles.inputContainer}>
           <Text style={styles.title}>
             A companion for you and your loved ones
           </Text>
-
+        </View>
+        <View style={styles.inputContainer}>
           <View style={styles.form}>
             <Text
               style={{
                 alignSelf: "center",
                 fontSize: 20,
                 color: Color.colorDarkslategray,
+                marginBottom: 15,
               }}
             >
               Create Account
@@ -132,21 +133,6 @@ export default function SignUp({ navigation }) {
             <TouchableOpacity style={styles.login}>
               <Text style={styles.loginText}>Sign Up</Text>
             </TouchableOpacity>
-
-            <Pressable
-              onPress={() => {
-                navigation.navigate(Route.LOGIN);
-              }}
-            >
-              <Text
-                style={[
-                  styles.termsLink,
-                  { textAlign: "center", marginTop: 5 },
-                ]}
-              >
-                Already Have a Account?
-              </Text>
-            </Pressable>
           </View>
         </View>
         <Pressable
@@ -183,7 +169,7 @@ const styles = StyleSheet.create({
     height: height * 0.3,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     alignSelf: "center",
     textAlign: "center",
     width: "70%",
@@ -192,7 +178,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 32,
     maxWidth: "80%",
-    color: "#ffffff",
+    color: Color.appDefaultColor,
     textAlign: "center",
     fontFamily: FontFamily.poppinsRegular,
     fontWeight: "600",
