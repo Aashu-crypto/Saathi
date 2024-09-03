@@ -32,10 +32,24 @@ import ServiceSelector from "../service/Service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Accordion from "../../components/Accordion";
 import { useFocusEffect } from "@react-navigation/native";
+import Divider from "../../components/Divider";
+import { useSelector } from "react-redux";
+
 const Feed = () => {
   const currentRef = useRef(0);
   const flatListRef = useRef(null);
   const currentIndex = useRef(0);
+  useEffect(() => {
+    const fetchData = async () => {
+      const fet = await fetch(
+        `https://saathi.etheriumtech.com:444/Saathi/subscribers/active`
+      );
+      const json = await fet.json();
+      console.log(json);
+    };
+    fetchData();
+  }, []);
+
   const testimonials = [
     {
       id: "1",
@@ -60,40 +74,9 @@ const Feed = () => {
       rating: 5,
     },
   ];
-  const packages = [
-    {
-      id: "1",
-      title: "Basic",
-      description: `• 1 hour call every week with call records in "My Feed"\n• 1 house visit for health check and well-being\n• Digital media uploaded to "My Feed"\n`,
-      price: "$30/m (Rs. 2500/m)",
-      icon: "star-outline",
-      colors: ["#FFD700", "#2575fc"],
-    },
-    {
-      id: "2",
-      title: "Bronze",
-      description: `• 1 hour call every week with call records in "My Feed"\n• 2 house visits for health check and well-being\n• Upto 2 hours of running errands\n• Digital media uploaded to "My Feed"\n`,
-      price: "$40/m (Rs. 3500/m)",
-      icon: "medal-outline",
-    },
-    {
-      id: "3",
-      title: "Silver",
-      description: `• 1 hour call every week with call records in "My Feed"\n• Weekly house visits for health check and well-being\n• Upto 4 hours of running errands\n• Driving patrons (upto 2) to a destination and back within 4 hours\n• Digital media uploaded to "My Feed"\n`,
-      price: "$60/m (Rs. 5000/m)",
-      icon: "trophy-outline",
-      colors: ["#C9D6FF", "#E2E2E2"],
-    },
-    {
-      id: "4",
-      title: "Gold",
-      description: `• 1 hour call every week with call records in "My Feed"\n• Weekly house visits for health check and well-being\n• Upto 8 hours of running errands\n• Driving patrons (upto 2) to a destination and back within 4 hours twice a month\n• Digital media uploaded to "My Feed"\n`,
-      price: "$80/m (Rs. 6500/m)",
-      icon: "ribbon-outline",
-      colors: ["#f4c4f3", "#fc67fa"],
-    },
-  ];
+
   const [mail, setMail] = useState();
+  const profile = useSelector((state) => state.profile.data || {});
   useEffect(() => {
     const fetch = async () => {
       const mail = await AsyncStorage.getItem("Email");
@@ -105,30 +88,21 @@ const Feed = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       currentIndex.current = (currentIndex.current + 1) % testimonials.length;
-      flatListRef.current.scrollToIndex({
-        index: currentIndex.current,
-        animated: true,
-      });
+
+      if (flatListRef.current) {
+        // Check if the ref is available
+        flatListRef.current.scrollToIndex({
+          index: currentIndex.current,
+          animated: true,
+        });
+      }
     }, 2500); // Auto-slide interval in milliseconds
 
     return () => clearInterval(interval); // Clear the interval on unmount
   }, []);
-  const exploreOptions = [
-    { name: "City Rides", icon: cityRide },
-    { name: "Home Visit", icon: rental },
-    { name: "Shared Rides", icon: rides },
-    { name: "Lugage", icon: airportRides },
-    { name: "Errands", icon: scheduleRides },
-  ];
-  const SubscriptionCard = ({ item }) => (
-    <View style={[styles.card, { backgroundColor: item.colors[0] }]}>
-      <Text style={styles.title}>{item.title} Package</Text>
-      <Text style={styles.description}>{item.description}</Text>
-      <Text style={styles.price}>{item.price}</Text>
-    </View>
-  );
+
   const TestimonialItem = ({ item }) => (
-    <View style={{ flex: 1, width: width }}>
+    <View style={{ flex: 1, width: width * 0.95 }}>
       <View style={styles.testimonialContainer}>
         <Image source={{ uri: item.avatar }} style={styles.avatar} />
         <View style={styles.textContainer}>
@@ -147,44 +121,12 @@ const Feed = () => {
     <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
       <StatusBar style="dark" />
       <HeaderComponent title={"Saathi"} />
-      <View>
-        <Text
-          style={{
-            textAlign: "center",
-            paddingHorizontal: 15,
-            paddingBottom: 15,
-            fontWeight: "400",
-            fontSize: 14,
-          }}
-        >
-          A companion for you and your loved ones
-        </Text>
-        {/* <View
-        style={{ gap: 10, padding: 10 }}
-      >
-        <Text style={{ textAlign: "center", fontWeight: "800", fontSize: 20 }}>
-          Our Mission
-        </Text>
-        <Text
-          style={{
-            textAlign: "center",
-            paddingHorizontal: 15,
-            paddingBottom: 15,
-            fontWeight: "500",
-          }}
-        >
-          Saathi is dedicated to supporting families by providing services to
-          loved ones in semi-urban or rural areas, offering everything from
-          companionship to essential care like doctor visits and home
-          assistance, ensuring they are well cared for even when you're far
-          away.
-        </Text>
-      </View> */}
-      </View>
-      {mail?.length && <ServicesTaken />}
-      {!mail?.length && <Packages />}
-      
-      <Accordion />
+
+      {/* <ServiceSelector/> */}
+      {Object.keys(profile).length !== 0 && <ServicesTaken />}
+      {Object.keys(profile).length === 0 && <Packages />}
+
+      {Object.keys(profile).length !== 0 && <ServiceSelector />}
       {/* <View style={styles.exploreButtons}>
         {exploreOptions.map((option, index) => (
           <TouchableOpacity key={index} style={styles.exploreButton}>
@@ -200,8 +142,8 @@ const Feed = () => {
           </TouchableOpacity>
         ))}
       </View> */}
-      <ServiceSelector />
-      {!mail?.length && (
+
+      {Object.keys(profile).length === 0 && (
         <View>
           <Text style={styles.mainTitle}>Testimonials</Text>
           <FlatList
@@ -304,10 +246,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   mainTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    textAlign: "center",
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: "600",
+    textAlign: "left",
+    marginVertical: 10,
+    color: "#1F2937",
+    paddingHorizontal: 10,
   },
   exploreButton: {
     width: width * 0.27,

@@ -25,7 +25,6 @@ const AboutUs = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <HeaderComponent title="About Us" />
       <Text style={styles.heading}>Why Saathi?</Text>
       <Text style={styles.paragraph}>
         Saathi was created with one goal in mind: to bring peace of mind to
@@ -39,7 +38,14 @@ const AboutUs = () => {
       <View style={styles.keyValuesContainer}>
         {keyValues.map((keyValue, index) => (
           <View key={index} style={styles.keyValue}>
-            <View style={{ flexDirection: "row",justifyContent:'center',alignItems:'center',marginVertical:10 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                marginVertical: 10,
+              }}
+            >
               <Ionicons
                 name={keyValue.icon}
                 size={24}
@@ -92,7 +98,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 15,
-
   },
   keyValueTitle: {
     fontSize: 18,

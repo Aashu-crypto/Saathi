@@ -65,7 +65,7 @@ const ServicesTaken = () => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Service Logs</Text>
+      <Text style={styles.title}>Activity</Text>
       <FlatList
         data={serviceLogs}
         renderItem={renderItem}
@@ -86,18 +86,19 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: "600",
     marginBottom: 20,
     textAlign: "center",
   },
   list: {
     paddingBottom: 20,
+    gap: 15,
   },
   logItem: {
     backgroundColor: "white",
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
+    padding: 13,
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

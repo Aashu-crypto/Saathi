@@ -28,7 +28,7 @@ const rootReducer = combineReducers({
   profile: profileSlice,
   articleId: articleIdSlice,
   booking: BookingSlice,
-  token: tokenSlice,
+
 });
 
 const persistConfig = {

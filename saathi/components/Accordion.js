@@ -5,34 +5,42 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Image,
 } from "react-native";
 import Collapsible from "react-native-collapsible";
 import { Ionicons } from "@expo/vector-icons";
 import { Color } from "../GlobalStyles";
+import img1 from "../assets/imgs/1.jpeg";
+import img2 from "../assets/imgs/2.jpeg";
+import img3 from "../assets/imgs/3.jpeg";
+import img4 from "../assets/imgs/4.jpeg";
 
 const Accordion = () => {
   const [activeSections, setActiveSections] = useState([0]);
 
   const SECTIONS = [
     {
-      title: "Step 1: Let get Started!",
-      content:
-        " Saathi is easy to set up and start using right away.",
+      title: "Step 1: Register with us",
+      content: "Saathi is easy to set up so start using right away.",
+      img: img1,
     },
     {
-      title: "Step 2: Choose a Package",
+      title: "Step 2: We assign a Saathi to you",
       content:
         "Select a care package that best suits your family’s needs, whether it’s regular social calls, errands, or in-person check-ins.",
+      img: img2,
     },
     {
-      title: "Step 3: Connect with a Saathi",
+      title: "Step 3: Saathi connects with patrons",
       content:
         "Your assigned Saathi companion will reach out to your family member and start providing the care and support they need. You’ll receive updates and reports directly to your phone.",
+      img: img3,
     },
     {
       title: "Step 4: Stay Informed",
       content:
         "Track your Saathi’s visits, check-ins, and progress reports through the app, so you always know how your loved one is doing.",
+      img: img4,
     },
   ];
 
@@ -48,14 +56,14 @@ const Accordion = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text
         style={{
-          fontSize: 20,
+          fontSize: 22,
           fontWeight: "600",
-          textAlign: "center",
-          marginBottom: 10,
-          color:Color.appDefaultColor
+          textAlign: "left",
+          marginVertical: 20,
+          color: "#1F2937",
         }}
       >
-        How It Works{" "}
+        How We Work
       </Text>
       {SECTIONS.map((section, index) => (
         <View key={index} style={styles.sectionContainer}>
@@ -87,7 +95,7 @@ const Accordion = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    paddingHorizontal: 10,
     backgroundColor: "#fff",
   },
   sectionContainer: {
@@ -122,6 +130,12 @@ const styles = StyleSheet.create({
   contentText: {
     fontSize: 14,
     color: "#666666",
+    marginBottom: 10,
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
   },
 });
 

@@ -23,7 +23,7 @@ const BottomTab = () => {
         name={Route.FEED_STACK}
         component={FeedStack}
         options={{
-          title: "Feed",
+          title: "Home",
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="home"

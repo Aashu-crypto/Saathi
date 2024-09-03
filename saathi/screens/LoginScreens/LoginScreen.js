@@ -14,8 +14,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import Icon from "react-native-vector-icons/FontAwesome";
+
 import { Color, FontFamily } from "../../GlobalStyles";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -24,6 +23,8 @@ import { Route } from "../../routes";
 const { width, height } = Dimensions.get("window");
 import { useDispatch } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
+import { profileData } from "../../Redux/Slice/ProfileDataSlice";
+import SignUpSvg from "../../assets/imgs/SignInSvg.svg";
 export default function LoginScreen({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -35,13 +36,49 @@ export default function LoginScreen({ navigation }) {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  const handleContinue = async () => {
-    if (phoneNumber.length === 10 && /^[0-9]+$/.test(phoneNumber)) {
-      await AsyncStorage.setItem("number", phoneNumber);
-    } else {
+
+  const handleLogin = async () => {
+    const formData = new FormData();
+    formData.append("email", email.trim()); // Trim whitespace from email input
+    formData.append("password", password);
+
+    try {
+      const response = await fetch(
+        `https://saathi.etheriumtech.com:444/Saathi/subscribers/login`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      // Check if the response is successful
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage =
+          errorData.message ||
+          "An unexpected error occurred. Please try again.";
+        Alert.alert("Login Failed", errorMessage);
+        return;
+      }
+
+      const json = await response.json();
+      console.log("Login successful:", json);
+
+      // Save email to AsyncStorage
+      await AsyncStorage.setItem("Email", email);
+      dispatch(profileData(json));
+
+      // Navigate to the main screen
+      dispatch(screen(Route.MAIN));
+
+      // Optionally, clear the input fields after successful login
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      console.error("Error during login:", error);
       Alert.alert(
-        "Invalid Phone Number",
-        "Please enter a valid 10-digit phone number."
+        "Login Error",
+        "An error occurred during the login process. Please check your network connection and try again."
       );
     }
   };
@@ -54,14 +91,12 @@ export default function LoginScreen({ navigation }) {
     >
       <SafeAreaView style={styles.container}>
         <StatusBar style="dark" />
-        <View
-          colors={[Color.appDefaultColor, Color.lightOrange]}
-          style={styles.headerContainer}
-        >
+        <View style={styles.headerContainer}>
           <Text style={styles.headerText}>Saathi</Text>
           <Text style={styles.title}>
             A companion for you and your loved ones
           </Text>
+          <SignUpSvg height={150} width={150} />
         </View>
         <View style={styles.inputContainer}>
           <View style={styles.form}>
@@ -96,13 +131,7 @@ export default function LoginScreen({ navigation }) {
 
             {!isLoaded ? (
               <>
-                <TouchableOpacity
-                  style={styles.login}
-                  onPress={() => {
-                    AsyncStorage.setItem("Email", email);
-                    dispatch(screen(Route.MAIN));
-                  }}
-                >
+                <TouchableOpacity style={styles.login} onPress={handleLogin}>
                   <Text style={styles.loginText}>Login</Text>
                 </TouchableOpacity>
 
@@ -158,22 +187,24 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     height: height * 0.3,
+    backgroundColor: Color.appDefaultColor,
   },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     alignSelf: "center",
     textAlign: "center",
-    width: "70%",
+    width: "80%",
     marginTop: 10,
+    color: "white",
   },
   headerText: {
     fontSize: 32,
     maxWidth: "80%",
-    color: Color.appDefaultColor,
+    color: "white",
     textAlign: "center",
-    fontFamily: FontFamily.poppinsRegular,
+    fontFamily: FontFamily.dreamOrphan,
     fontWeight: "600",
-    lineHeight: 30,
+    lineHeight: 35,
     letterSpacing: 2,
   },
   PhoneText: {

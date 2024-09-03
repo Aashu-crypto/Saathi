@@ -24,6 +24,8 @@ const { width, height } = Dimensions.get("window");
 import { useDispatch } from "react-redux";
 import { Route } from "../../routes";
 import { screen } from "../../Redux/Slice/screenNameSlice";
+import { profileData } from "../../Redux/Slice/ProfileDataSlice";
+import SignUpSvg from "../../assets/imgs/signup.svg";
 export default function SignUp({ navigation }) {
   const [number, setNumber] = useState();
   const [email, setEmail] = useState("");
@@ -31,22 +33,52 @@ export default function SignUp({ navigation }) {
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [userType, setUserType] = useState(false);
+
   const dispatch = useDispatch();
-  const [isLoaded, setIsLoaded] = useState(false);
+
   const [loginError, setLoginError] = useState(null);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  const handleContinue = async () => {
-    if (phoneNumber.length === 10 && /^[0-9]+$/.test(phoneNumber)) {
-      await AsyncStorage.setItem("number", phoneNumber);
-    } else {
-      Alert.alert(
-        "Invalid Phone Number",
-        "Please enter a valid 10-digit phone number."
+
+  const handleSubmit = async () => {
+    // Collect the form data
+    const formData = {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phoneNumber: number,
+      password: password,
+    };
+
+    try {
+      // Send the POST request with JSON data
+      const response = await fetch(
+        `https://saathi.etheriumtech.com:444/Saathi/subscribers`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Set the request headers
+          },
+          body: JSON.stringify(formData), // Convert the data to a JSON string
+        }
       );
+
+      // Handle the response
+      const json = await response.json();
+      console.log(json);
+      dispatch(profileData(json));
+      dispatch(screen(Route.MAIN));
+
+      if (response.ok) {
+        Alert.alert("Success", "Account created successfully!");
+        // You can navigate to another screen or perform other actions
+      } else {
+        Alert.alert("Error", json.message || "Something went wrong!");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "An error occurred. Please try again.");
     }
   };
 
@@ -66,6 +98,7 @@ export default function SignUp({ navigation }) {
           <Text style={styles.title}>
             A companion for you and your loved ones
           </Text>
+          <SignUpSvg height={100} width={100} />
         </View>
         <View style={styles.inputContainer}>
           <View style={styles.form}>
@@ -74,16 +107,23 @@ export default function SignUp({ navigation }) {
                 alignSelf: "center",
                 fontSize: 20,
                 color: Color.colorDarkslategray,
-                marginBottom: 15,
+                marginBottom: 25,
               }}
             >
               Create Account
             </Text>
             <TextInput
               style={[styles.input, { borderBottomWidth: 1 }]}
-              placeholder="Enter your name"
+              placeholder="Enter your first name"
               onChangeText={setFirstName}
               value={firstName}
+              placeholderTextColor={Color.colorDarkslategray}
+            />
+            <TextInput
+              style={[styles.input, { borderBottomWidth: 1 }]}
+              placeholder="Enter your last name"
+              onChangeText={setLastName}
+              value={lastName}
               placeholderTextColor={Color.colorDarkslategray}
             />
 
@@ -130,7 +170,7 @@ export default function SignUp({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.login}>
+            <TouchableOpacity style={styles.login} onPress={handleSubmit}>
               <Text style={styles.loginText}>Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -166,23 +206,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    height: height * 0.3,
+    height: height * 0.25,
   },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     alignSelf: "center",
     textAlign: "center",
-    width: "70%",
+    width: "80%",
     marginTop: 10,
+    color: Color.colorGray,
   },
   headerText: {
     fontSize: 32,
     maxWidth: "80%",
     color: Color.appDefaultColor,
     textAlign: "center",
-    fontFamily: FontFamily.poppinsRegular,
+    fontFamily: FontFamily.dreamOrphan,
     fontWeight: "600",
-    lineHeight: 30,
+    lineHeight: 35,
     letterSpacing: 2,
   },
   PhoneText: {

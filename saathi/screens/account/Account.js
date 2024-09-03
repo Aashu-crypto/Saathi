@@ -11,19 +11,23 @@ import { Color, FontFamily, width } from "../../GlobalStyles";
 import HeaderComponent from "../../components/HeaderComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "../../components/UserPic";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
+import Divider from "../../components/Divider";
+import { profileData } from "../../Redux/Slice/ProfileDataSlice";
 const Account = ({ navigation }) => {
   const profileOptionsData = [
-    { title: "Contact Us" },
-    { title: "About us" ,route:Route.ABOUTUS},
-    { title: "How we do things" },
+    { title: "About us", route: Route.ABOUTUS },
+
     { title: "Your Saathi", route: Route.YOURSAATHI },
     { title: "Your Packages", route: Route.YOURPACKAGES },
   ];
   const [mail, setMail] = useState();
   const dispatch = useDispatch();
+  const profile = useSelector((state) => state.profile.data || {});
+  console.log(profile);
+
   useEffect(() => {
     const fetch = async () => {
       const mail = await AsyncStorage.getItem("Email");
@@ -36,7 +40,8 @@ const Account = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <HeaderComponent title={"Profile"} />
-      <ScrollView style={{ marginHorizontal: 10 }}>
+
+      <ScrollView style={{ marginHorizontal: 10, flex: 1 }}>
         {/* Commented out section; not relevant to map function focus */}
         <View
           style={{
@@ -44,11 +49,18 @@ const Account = ({ navigation }) => {
             alignItems: "center",
             flexDirection: "row",
             gap: 10,
+            marginVertical: 10,
           }}
         >
           <User />
-          {mail?.length ? (
-            <Text>{mail}</Text>
+          {profile && Object.keys(profile).length !== 0 ? (
+            <View>
+              <Text style={styles.profileName}>
+                {profile.firstName} {profile.lastName}
+              </Text>
+
+              <Text style={styles.infoText}>{profile.email}</Text>
+            </View>
           ) : (
             <Pressable
               style={{
@@ -83,9 +95,7 @@ const Account = ({ navigation }) => {
           <View key={item.title}>
             <TouchableOpacity
               onPress={() => {
-                if (item.route) {
-                  navigation.navigate(item.route);
-                }
+                item.route && navigation.navigate(item.route);
               }}
             >
               <View style={styles.titleView}>
@@ -95,17 +105,16 @@ const Account = ({ navigation }) => {
             <View style={{ borderWidth: 0.5 }} />
           </View>
         ))}
-        <Pressable onPress={() => AsyncStorage.clear()}>
-          <Text style={[styles.titleText, { padding: 5 }]}>Logout</Text>
-        </Pressable>
-
-        {/* <Pressable
-          onPress={() => {
-            AsyncStorage.removeItem("number");
-          }}
-        >
-          <Text>Logout</Text>
-        </Pressable> */}
+        {Object.keys(profile).length !== 0 && (
+          <Pressable
+            onPress={() => {
+              dispatch(profileData([]));
+            }}
+            style={styles.logout}
+          >
+            <Text style={[styles.titleText, styles.logoutText]}>Logout</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </View>
   );
@@ -148,5 +157,37 @@ const styles = StyleSheet.create({
     color: Color.colorDarkslategray,
     fontWeight: "700",
     fontSize: 25,
+  },
+  logout: {
+    backgroundColor: Color.appDefaultColor,
+    width: width * 0.8,
+    padding: 10,
+    alignItems: "center",
+    alignSelf: "center",
+    borderRadius: 10,
+    marginTop: 50,
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "700",
+    letterSpacing: 2,
+  },
+  profileName: {
+    color: Color.colorDarkslategray,
+    fontFamily: FontFamily.poppinsRegular,
+    fontSize: 25,
+    marginLeft: 14,
+
+    fontWeight: "500",
+    letterSpacing: 1,
+    width: "auto",
+  },
+  infoText: {
+    color: Color.colorGray,
+    fontFamily: FontFamily.poppinsRegular,
+    fontSize: 12,
+    marginBottom: 5,
+    marginLeft: 15,
   },
 });

@@ -10,10 +10,14 @@ import {
   Button,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Color, width } from "../../GlobalStyles";
+import { useDispatch, useSelector } from "react-redux";
+import { screen } from "../../Redux/Slice/screenNameSlice";
+import { Route } from "../../routes";
 
 const availableServices = [
   {
@@ -51,11 +55,12 @@ const ServiceSelector = () => {
   const [patronName, setPatronName] = useState("");
   const [address, setAddress] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-
+  const dispatch = useDispatch();
   const handleServiceSelect = (service) => {
     setSelectedService(service);
     setModalVisible(true);
   };
+  const profile = useSelector((state) => state.profile.data || {});
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -65,6 +70,11 @@ const ServiceSelector = () => {
 
   const handleConfirm = () => {
     // Process the service booking with the entered data
+
+    if (!patronName || !address || !mobileNumber) {
+      Alert.alert("Missing Information", "Please fill out all the details.");
+      return;
+    }
     console.log({
       service: selectedService.service,
       date,
@@ -72,6 +82,8 @@ const ServiceSelector = () => {
       address,
       mobileNumber,
     });
+
+    Alert.alert("We will notify you once the booking is confirmed");
     setConfirmBookingVisible(false);
     setModalVisible(false);
     // Reset inputs
@@ -79,10 +91,33 @@ const ServiceSelector = () => {
     setAddress("");
     setMobileNumber("");
   };
+  const handleProceed = () => {
+    if (Object.keys(profile).length === 0) {
+      Alert.alert(
+        "Please Log In first",
+        "You need to log in to proceed with the booking.",
+        [
+          {
+            text: "Proceed To Login",
+            onPress: () => dispatch(screen(Route.LOGIN)),
+          },
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+        ]
+      );
+      return; // Prevent proceeding if the user is not logged in
+    }
 
+    // If the user is logged in, proceed to confirm booking
+    setConfirmBookingVisible(true);
+    setModalVisible(false);
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Request a Service</Text>
+      <Text style={styles.title}>Request Services</Text>
       <FlatList
         data={availableServices}
         renderItem={({ item }) => (
@@ -94,7 +129,6 @@ const ServiceSelector = () => {
               <Ionicons name={item.icon} size={24} color="white" />
             </View>
             <Text style={styles.serviceText}>{item.service}</Text>
-            <Ionicons name="chevron-forward-outline" size={20} color="#999" />
           </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}
@@ -113,19 +147,17 @@ const ServiceSelector = () => {
               <Text style={styles.modalTitle}>{selectedService.service}</Text>
               <Text style={styles.modalCost}>Cost: {selectedService.cost}</Text>
 
-              <ScrollView style={styles.modalDetailsContainer} showsVerticalScrollIndicator={false}>
+              <ScrollView
+                style={styles.modalDetailsContainer}
+                showsVerticalScrollIndicator={false}
+              >
                 <Text style={styles.modalDetails}>
                   {selectedService.details}
                 </Text>
               </ScrollView>
 
               <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setConfirmBookingVisible(true);
-                    setModalVisible(false);
-                  }}
-                >
+                <TouchableOpacity onPress={handleProceed}>
                   <Text
                     style={[
                       styles.buttonText,
@@ -230,10 +262,11 @@ const ServiceSelector = () => {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                 
                   onPress={() => setConfirmBookingVisible(false)}
                 >
-                  <Text style={[styles.buttonText, { color: "black" }]}>Cancel</Text>
+                  <Text style={[styles.buttonText, { color: "black" }]}>
+                    Cancel
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -251,12 +284,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
-    marginTop: 10,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: "400",
+    marginVertical: 20,
     textAlign: "center",
   },
   list: {
@@ -315,7 +347,7 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 20, // Extra space below cost to separate it from details
     textAlign: "center",
-    fontWeight:'600'
+    fontWeight: "600",
   },
   modalDetailsContainer: {
     maxHeight: 150, // Constrain height to ensure it doesn’t overflow
