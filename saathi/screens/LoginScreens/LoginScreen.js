@@ -96,7 +96,6 @@ export default function LoginScreen({ navigation }) {
       <SafeAreaView style={styles.container}>
         <StatusBar style="dark" />
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Saathi</Text>
           <Text style={styles.title}>
             A companion for you and your loved ones
           </Text>
@@ -197,7 +196,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     textAlign: "center",
     width: "80%",
-    marginTop: 10,
+    marginTop: 0,
     color: Color.colorGray,
   },
   headerText: {

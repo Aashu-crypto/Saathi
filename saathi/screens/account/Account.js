@@ -39,7 +39,6 @@ const Account = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <HeaderComponent title={"Profile"} />
 
       <ScrollView style={{ marginHorizontal: 10, flex: 1 }}>
         {/* Commented out section; not relevant to map function focus */}

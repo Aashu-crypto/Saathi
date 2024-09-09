@@ -26,7 +26,7 @@ const AboutUs = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <HeaderComponent title={"About Us"} />
+
       <Text style={styles.heading}>Why Saathi?</Text>
       <Text style={styles.paragraph}>
         Saathi was created with one goal in mind: to bring peace of mind to

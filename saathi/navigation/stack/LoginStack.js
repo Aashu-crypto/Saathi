@@ -6,6 +6,7 @@ import LoginScreen from "../../screens/LoginScreens/LoginScreen";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Route } from "../../routes";
+import { Color } from "../../GlobalStyles";
 import SignUp from "../../screens/LoginScreens/SignUp";
 
 const LoginStack = () => {
@@ -35,12 +36,34 @@ const LoginStack = () => {
 
   return (
     <Stack.Navigator
+    initialRouteName={Route.LOGIN}
       screenOptions={{
         headerShown: false,
+        
       }}
     >
-      <Stack.Screen name={Route.SIGNUP} component={SignUp} />
-      <Stack.Screen name={Route.LOGIN} component={LoginScreen} />
+      <Stack.Screen name={Route.SIGNUP} component={SignUp}  options={{
+        headerShown:true,
+        headerTitleAlign:"center",
+        headerTitle:'Saathi',
+        headerTitleStyle:{
+          fontFamily:'Dream-Orphans-bd',
+          color:Color.appDefaultColor,
+          letterSpacing:2,
+          fontSize:25
+        }
+      }} />
+      <Stack.Screen name={Route.LOGIN} component={LoginScreen}  options={{
+        headerShown:true,
+        headerTitleAlign:"center",
+        headerTitle:'Saathi',
+        headerTitleStyle:{
+          fontFamily:'Dream-Orphans-bd',
+          color:Color.appDefaultColor,
+          letterSpacing:2,
+          fontSize:25
+        }
+      }} />
     </Stack.Navigator>
   );
 };

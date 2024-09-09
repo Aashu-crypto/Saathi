@@ -120,7 +120,7 @@ const Feed = () => {
   return (
     <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
       <StatusBar style="dark" />
-      <HeaderComponent title={"Saathi"} />
+   
 
       {/* <ServiceSelector/> */}
       {Object.keys(profile).length !== 0 && <ServicesTaken />}
