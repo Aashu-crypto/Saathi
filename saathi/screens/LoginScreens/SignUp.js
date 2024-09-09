@@ -43,6 +43,10 @@ export default function SignUp({ navigation }) {
 
   const handleSubmit = async () => {
     // Collect the form data
+    if (!firstName || !lastName || !email || !password) {
+      Alert.alert("Please fill all the fields before Submitting");
+      return;
+    }
     const formData = {
       firstName: firstName,
       lastName: lastName,
@@ -71,14 +75,14 @@ export default function SignUp({ navigation }) {
       dispatch(screen(Route.MAIN));
 
       if (response.ok) {
-        Alert.alert("Success", "Account created successfully!");
+        Alert.alert("Your request has been Submitted !","We will get back to you shortly" );
         // You can navigate to another screen or perform other actions
       } else {
-        Alert.alert("Error", json.message || "Something went wrong!");
+        Alert.alert("Error", json.message || "Please Fill all the fields");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "An error occurred. Please try again.");
+      Alert.alert("Error", "An error occurred. Please Fill all the forms");
     }
   };
 

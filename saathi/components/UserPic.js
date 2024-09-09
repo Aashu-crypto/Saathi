@@ -3,8 +3,8 @@ export function User() {
   return (
     <Svg
       xmlns="http://www.w3.org/2000/svg"
-      width={90} // Adjust this if you want a different size
-      height={90} // Adjust this if you want a different size
+      width={80} // Adjust this if you want a different size
+      height={80} // Adjust this if you want a different size
       fill="none"
       viewBox="0 0 43 43" // Changed viewBox for square aspect ratio
     >

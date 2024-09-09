@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,9 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -18,6 +21,7 @@ import { Color, width } from "../../GlobalStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
+import { BACKEND_HOST } from "../../config"; // Assuming your config has BACKEND_HOST
 
 const availableServices = [
   {
@@ -55,12 +59,28 @@ const ServiceSelector = () => {
   const [patronName, setPatronName] = useState("");
   const [address, setAddress] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
+  const [loading, setLoading] = useState(false); // For showing the loader during API call
+  const [patron, setPatron] = useState();
   const dispatch = useDispatch();
+  const profile = useSelector((state) => state.profile.data || {});
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BACKEND_HOST}patrons/subscriber/1`);
+        const data = await response.json();
+        setPatron(data);
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Error Occured");
+      }
+    };
+    fetchData();
+  }, []);
   const handleServiceSelect = (service) => {
     setSelectedService(service);
     setModalVisible(true);
   };
-  const profile = useSelector((state) => state.profile.data || {});
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -68,37 +88,58 @@ const ServiceSelector = () => {
     setDate(currentDate);
   };
 
-  const handleConfirm = () => {
-    // Process the service booking with the entered data
+  const handleConfirm = async () => {
+ 
 
-    if (!patronName || !address || !mobileNumber) {
-      Alert.alert("Missing Information", "Please fill out all the details.");
-      return;
+    const bookingDetails = {
+      serviceID: selectedService.id,
+      serviceDate: date.toISOString().split("T")[0],
+      serviceTime: date.toTimeString().split(" ")[0],
+      billingStatus: 1, // Assuming 1 means billed
+      isAccepted: true,
+      subscriberID: profile.subscriberID,
+    };
+
+    try {
+      setLoading(true); // Show loader while API request is in progress
+      const response = await fetch(`${BACKEND_HOST}subscriber-services`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingDetails),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to book the service. Please try again.");
+      }
+
+      Alert.alert(
+        "Thank you for choosing us !",
+        "We will get back to you soon"
+      );
+      setConfirmBookingVisible(false);
+      setModalVisible(false);
+
+      // Reset inputs after booking
+      setPatronName("");
+      setAddress("");
+      setMobileNumber("");
+    } catch (error) {
+      Alert.alert("Error", error.message || "Something went wrong.");
+    } finally {
+      setLoading(false); // Hide loader after the request is completed
     }
-    console.log({
-      service: selectedService.service,
-      date,
-      patronName,
-      address,
-      mobileNumber,
-    });
-
-    Alert.alert("We will notify you once the booking is confirmed");
-    setConfirmBookingVisible(false);
-    setModalVisible(false);
-    // Reset inputs
-    setPatronName("");
-    setAddress("");
-    setMobileNumber("");
   };
+
   const handleProceed = () => {
     if (Object.keys(profile).length === 0) {
       Alert.alert(
-        "Please Log In first",
-        "You need to log in to proceed with the booking.",
+        "Login Required",
+        "Please log in to continue with your booking.",
         [
           {
-            text: "Proceed To Login",
+            text: "Proceed to Login",
             onPress: () => dispatch(screen(Route.LOGIN)),
           },
           {
@@ -111,13 +152,13 @@ const ServiceSelector = () => {
       return; // Prevent proceeding if the user is not logged in
     }
 
-    // If the user is logged in, proceed to confirm booking
     setConfirmBookingVisible(true);
     setModalVisible(false);
   };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Request Services</Text>
+      <Text style={styles.title}>Request a Service</Text>
       <FlatList
         data={availableServices}
         renderItem={({ item }) => (
@@ -147,10 +188,7 @@ const ServiceSelector = () => {
               <Text style={styles.modalTitle}>{selectedService.service}</Text>
               <Text style={styles.modalCost}>Cost: {selectedService.cost}</Text>
 
-              <ScrollView
-                style={styles.modalDetailsContainer}
-                showsVerticalScrollIndicator={false}
-              >
+              <ScrollView style={styles.modalDetailsContainer}>
                 <Text style={styles.modalDetails}>
                   {selectedService.details}
                 </Text>
@@ -158,19 +196,10 @@ const ServiceSelector = () => {
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={handleProceed}>
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      { color: Color.appDefaultColor },
-                    ]}
-                  >
-                    Proceed to Booking
-                  </Text>
+                  <Text style={styles.buttonText}>Proceed to Booking</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <Text style={[styles.buttonText, { color: "black" }]}>
-                    Cancel
-                  </Text>
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -185,92 +214,69 @@ const ServiceSelector = () => {
           visible={confirmBookingVisible}
           onRequestClose={() => setConfirmBookingVisible(false)}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                Schedule {selectedService.service}
-              </Text>
-
-              <Text style={styles.modalDescription}>
-                Please fill in the details below to book the service.
-              </Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Patron Name"
-                value={patronName}
-                onChangeText={setPatronName}
-                placeholderTextColor="#aaa"
-              />
-              <Text style={styles.inputLabel}>
-                Name of the person for whom the service is being booked.
-              </Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Address"
-                value={address}
-                onChangeText={setAddress}
-                placeholderTextColor="#aaa"
-              />
-              <Text style={styles.inputLabel}>
-                Complete address for the service visit.
-              </Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Mobile Number"
-                keyboardType="phone-pad"
-                value={mobileNumber}
-                onChangeText={setMobileNumber}
-                placeholderTextColor="#aaa"
-              />
-              <Text style={styles.inputLabel}>
-                Contact number for any follow-up.
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => setShowPicker(true)}
-                style={styles.datePickerButton}
-              >
-                <Text style={styles.datePickerText}>
-                  {date.toLocaleDateString()} {date.toLocaleTimeString()}
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  Schedule {selectedService.service}
                 </Text>
-              </TouchableOpacity>
-              <Text style={styles.inputLabel}>
-                Select the preferred date and time for the service.
-              </Text>
 
-              {showPicker && (
-                <DateTimePicker
-                  value={date}
-                  mode="datetime"
-                  display="default"
-                  onChange={handleDateChange}
+                {/* <TextInput
+                  style={styles.input}
+                  placeholder="Patron Name"
+                  value={patronName}
+                  onChangeText={setPatronName}
+                  placeholderTextColor="#aaa"
                 />
-              )}
+                <TextInput
+                  style={styles.input}
+                  placeholder="Address"
+                  value={address}
+                  onChangeText={setAddress}
+                  placeholderTextColor="#aaa"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Mobile Number"
+                  keyboardType="phone-pad"
+                  value={mobileNumber}
+                  onChangeText={setMobileNumber}
+                  placeholderTextColor="#aaa"
+                /> */}
 
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={handleConfirm}>
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      { color: Color.appDefaultColor },
-                    ]}
-                  >
-                    Confirm Booking
-                  </Text>
-                </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => setConfirmBookingVisible(false)}
+                  onPress={() => setShowPicker(true)}
+                  style={styles.datePickerButton}
                 >
-                  <Text style={[styles.buttonText, { color: "black" }]}>
-                    Cancel
+                  <Text style={styles.datePickerText}>
+                    {date.toLocaleDateString()} {date.toLocaleTimeString()}
                   </Text>
                 </TouchableOpacity>
+
+                {showPicker && (
+                  <DateTimePicker
+                    value={date}
+                    mode="datetime"
+                    display="default"
+                    onChange={handleDateChange}
+                  />
+                )}
+
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity onPress={handleConfirm}>
+                    <Text style={styles.confirmButtonText}>
+                      {loading ? <ActivityIndicator /> : "Confirm Booking"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setConfirmBookingVisible(false)}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
       )}
     </SafeAreaView>

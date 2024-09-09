@@ -24,7 +24,7 @@ const { width, height } = Dimensions.get("window");
 import { useDispatch } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { profileData } from "../../Redux/Slice/ProfileDataSlice";
-import SignUpSvg from "../../assets/imgs/SignInSvg.svg";
+import SignUpSvg from "../../assets/imgs/signup.svg";
 export default function LoginScreen({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -38,6 +38,10 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Please fill all the forms before Submiting");
+      return;
+    }
     const formData = new FormData();
     formData.append("email", email.trim()); // Trim whitespace from email input
     formData.append("password", password);
@@ -187,7 +191,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     height: height * 0.3,
-    backgroundColor: Color.appDefaultColor,
   },
   title: {
     fontSize: 13,
@@ -195,12 +198,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "80%",
     marginTop: 10,
-    color: "white",
+    color: Color.colorGray,
   },
   headerText: {
     fontSize: 32,
     maxWidth: "80%",
-    color: "white",
+    color: Color.appDefaultColor,
     textAlign: "center",
     fontFamily: FontFamily.dreamOrphan,
     fontWeight: "600",

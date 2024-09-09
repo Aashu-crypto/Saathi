@@ -2,12 +2,20 @@ import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Color } from "../GlobalStyles";
+import { User } from "./UserPic";
 
 const CompanionCard = ({ companion }) => {
   return (
     <View style={styles.cardContainer}>
       <View style={styles.header}>
-        <Image source={{ uri: companion.Picture }} style={styles.image} />
+        {companion.Picture === null ? (
+          <View style={{marginRight:10}}> 
+            <User />
+          </View>
+        ) : (
+          <Image source={{ uri: companion.Picture }} style={styles.image} />
+        )}
+
         <View style={styles.infoContainer}>
           <Text
             style={styles.name}
@@ -26,14 +34,14 @@ const CompanionCard = ({ companion }) => {
           <Text style={styles.userType}>{companion.UserType}</Text>
         </View>
       </View>
-      <View style={{ flexDirection: "row", gap: 10 }}>
+      {/* <View style={{ flexDirection: "row", gap: 10 }}>
         <Ionicons
           name="calendar-outline"
           size={16}
           color={Color.appDefaultColor}
         />
         <Text style={styles.dob}>{`DOB: ${companion.DOB}`}</Text>
-      </View>
+      </View> */}
 
       <Text style={styles.briefBio} numberOfLines={3}>
         {companion.BriefBio}

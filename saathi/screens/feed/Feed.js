@@ -126,7 +126,7 @@ const Feed = () => {
       {Object.keys(profile).length !== 0 && <ServicesTaken />}
       {Object.keys(profile).length === 0 && <Packages />}
 
-      {Object.keys(profile).length !== 0 && <ServiceSelector />}
+      {/* {Object.keys(profile).length !== 0 && <ServiceSelector />} */}
       {/* <View style={styles.exploreButtons}>
         {exploreOptions.map((option, index) => (
           <TouchableOpacity key={index} style={styles.exploreButton}>

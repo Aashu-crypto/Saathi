@@ -39,8 +39,8 @@ const LoginStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name={Route.LOGIN} component={LoginScreen} />
       <Stack.Screen name={Route.SIGNUP} component={SignUp} />
+      <Stack.Screen name={Route.LOGIN} component={LoginScreen} />
     </Stack.Navigator>
   );
 };

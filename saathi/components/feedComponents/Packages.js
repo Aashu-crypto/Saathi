@@ -74,7 +74,7 @@ const Packages = () => {
     {
       id: "1",
       title: "Basic",
-      description: `✓ Weekly 1-hour call\n✓ One house visit\n✓ Digital media in "My Feed"`,
+      description: `• One-hour call with patrons every week.\n• Includes one in-home visit to check health, take a photo, and ensure well-being.`,
       price: "$30/m\n(Rs. 2500/m)",
       icon: "star-outline",
       colors: ["rgba(186, 220, 188, 0.8)", "#4CAF50"], // Light mint green with dark green border
@@ -82,7 +82,7 @@ const Packages = () => {
     {
       id: "2",
       title: "Bronze",
-      description: `✓ Weekly 1-hour call\n✓ Two house visits\n✓ 2 hours of errands\n✓ Digital media in "My Feed"`,
+      description: `• One-hour call with patrons every week.\n• Two in-home visits to check health, take a photo, and ensure well-being.`,
       price: "$40/m\n(Rs. 3500/m)",
       icon: "medal-outline",
       colors: ["rgba(255, 224, 178, 0.8)", "#FFA726"], // Soft peach with deep orange border
@@ -90,7 +90,7 @@ const Packages = () => {
     {
       id: "3",
       title: "Silver",
-      description: `✓ Weekly 1-hour call\n✓ Weekly house visits\n✓ 4 hours of errands"`,
+      description: `• One-hour call with patrons every week.\n• Weekly in-home visits to check health, take a photo, and ensure well-being.`,
       price: "$60/m\n(Rs. 5000/m)",
       icon: "trophy-outline",
       colors: ["rgba(178, 235, 242, 0.8)", "#00ACC1"], // Light aqua with dark teal border
@@ -98,7 +98,7 @@ const Packages = () => {
     {
       id: "4",
       title: "Gold",
-      description: `✓ Weekly 1-hour call\n✓ Weekly house visits\n✓ 8 hours of errands"`,
+      description: `• One-hour call with patrons every week.\n• Weekly in-home visits to check health, take a photo, and ensure well-being.`,
       price: "$80/m\n(Rs. 6500/m)",
       icon: "ribbon-outline",
       colors: ["rgba(244, 213, 178, 0.8)", "#FF9800"], // Light sand with burnt orange border
@@ -133,11 +133,7 @@ const Packages = () => {
   ];
   const profile = useSelector((state) => state.profile.data);
   const handlePress = () => {
-    if (Object.keys(profile).length === 0) {
-      dispatch(screen(Route.LOGIN));
-    } else {
-      Alert.alert("Payment Gateway will open");
-    }
+    dispatch(screen(Route.LOGIN));
   };
 
   function Item({ index, scrollY, item }) {
@@ -197,7 +193,7 @@ const Packages = () => {
         support, managing daily tasks, or making sure health needs are met, we
         are here to help.
       </Text>
-      
+
       <Text style={styles.header}>Membership Benefits</Text>
       <View
         style={{
@@ -258,10 +254,13 @@ const Packages = () => {
       <Text style={styles.header}>Explore our Packages</Text>
       <FlatList
         data={packages}
+        horizontal
         renderItem={({ item, index }) => <Item index={index} item={item} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         decelerationRate="fast"
+        pagingEnabled
+        showsHorizontalScrollIndicator="false"
       />
       {Object.keys(profile).length === 0 && <Accordion />}
     </ScrollView>
@@ -340,8 +339,8 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     alignSelf: "flex-end",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -353,11 +352,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize:14,
+    fontSize: 13,
     fontWeight: "600",
-    textTransform: "uppercase",
+
     letterSpacing: 1.1,
-    textAlign:'center'
+    textAlign: "center",
   },
   keyValueTitle: {
     fontSize: 15,

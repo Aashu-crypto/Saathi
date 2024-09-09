@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import HeaderComponent from "../../../components/HeaderComponent";
 import { Color } from "../../../GlobalStyles";
+import { Header } from "@react-navigation/stack";
 
 const AboutUs = () => {
   const keyValues = [
@@ -25,6 +26,7 @@ const AboutUs = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <HeaderComponent title={"About Us"} />
       <Text style={styles.heading}>Why Saathi?</Text>
       <Text style={styles.paragraph}>
         Saathi was created with one goal in mind: to bring peace of mind to
