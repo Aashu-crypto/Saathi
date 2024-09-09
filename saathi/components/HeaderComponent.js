@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 import { Color, width } from "../GlobalStyles";
@@ -44,8 +44,9 @@ const styles = StyleSheet.create({
     width: width,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
-    marginTop: 15,
+
     alignItems: "center",
+    marginTop: Platform.OS == "android" && 25,
   },
   read: {
     color: Color.colorDarkslategray,
