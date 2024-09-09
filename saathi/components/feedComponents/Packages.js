@@ -207,6 +207,7 @@ const Packages = () => {
         {keyValues.map((item) => {
           return (
             <ImageBackground
+            key={item.title}
               source={require("../../assets/imgs/flowerBackground.png")}
             >
               <View
@@ -259,8 +260,9 @@ const Packages = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         decelerationRate="fast"
+        
         pagingEnabled
-        showsHorizontalScrollIndicator="false"
+        showsHorizontalScrollIndicator={false}
       />
       {Object.keys(profile).length === 0 && <Accordion />}
     </ScrollView>
