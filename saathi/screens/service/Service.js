@@ -6,49 +6,19 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
-  TextInput,
-  Button,
-  SafeAreaView,
   ScrollView,
+  SafeAreaView,
   Alert,
+  ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Color, width } from "../../GlobalStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
 import { BACKEND_HOST } from "../../config"; // Assuming your config has BACKEND_HOST
-
-const availableServices = [
-  {
-    id: "1",
-    service: "Destination Drive",
-    icon: "car-outline",
-    cost: "$40/m (Rs. 3000)",
-    details:
-      "Each Destination Drive provided at $40 (Rs. 3000) – Total of less than 3 hours and limited to 2 patrons; Driving done in a small sedan so luggage should be appropriate. No more than 2 people allowed. Each extra person will be a $10 (Rs. 800) extra charge; Driving hours between 7 am and 10 pm. Surge pricing (1.5x basic charge applied outside the normal driving hours); For larger cars, an extra fixed levy of $20 (Rs. 1600) applied. Each extra hour of driving will be charged at $15 (Rs. 1200).",
-  },
-  {
-    id: "2",
-    service: "House Check",
-    icon: "home-outline",
-    cost: "$10/m (Rs. 800)",
-    details:
-      "Each extra house check provided at $10 (Rs. 800). House checks will be done during normal business hours (between 10 am and 6 pm only). Any house check done outside of business hours will incur a Surge pricing charge (1.5x basic charge).",
-  },
-  {
-    id: "3",
-    service: "Errand Run",
-    icon: "cart-outline",
-    cost: "$20/m (Rs. 1500)",
-    details:
-      "Each errand run provided at $20 (Rs. 1500) – Total of less than 2 hours.",
-  },
-];
+import { Color, FontFamily } from "../../GlobalStyles";
 
 const ServiceSelector = () => {
   const [selectedService, setSelectedService] = useState(null);
@@ -56,27 +26,26 @@ const ServiceSelector = () => {
   const [confirmBookingVisible, setConfirmBookingVisible] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const [patronName, setPatronName] = useState("");
-  const [address, setAddress] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [loading, setLoading] = useState(false); // For showing the loader during API call
-  const [patron, setPatron] = useState();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile.data || {});
+
+  // Fetch services from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BACKEND_HOST}patrons/subscriber/1`);
+        const response = await fetch(`${BACKEND_HOST}/alacarteservices`);
         const data = await response.json();
-        setPatron(data);
-        console.log(data);
+
+        setServices(data);
       } catch (error) {
-        console.log(error);
-        Alert.alert("Error Occured");
+        Alert.alert("Error Occured", error.message);
       }
     };
     fetchData();
   }, []);
+
   const handleServiceSelect = (service) => {
     setSelectedService(service);
     setModalVisible(true);
@@ -89,51 +58,43 @@ const ServiceSelector = () => {
   };
 
   const handleConfirm = async () => {
- 
+    if (!selectedService) return;
 
     const bookingDetails = {
-      serviceID: selectedService.id,
+      serviceID: selectedService.serviceID,
       serviceDate: date.toISOString().split("T")[0],
       serviceTime: date.toTimeString().split(" ")[0],
-      billingStatus: 1, // Assuming 1 means billed
+      billingStatus: 1,
       isAccepted: true,
       subscriberID: profile.subscriberID,
     };
 
     try {
-      setLoading(true); // Show loader while API request is in progress
-      const response = await fetch(`${BACKEND_HOST}subscriber-services`, {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_HOST}/subscriber-services`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingDetails),
       });
 
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error("Failed to book the service. Please try again.");
-      }
 
       Alert.alert(
-        "Thank you for choosing us !",
-        "We will get back to you soon"
+        "Success",
+        "Thank you for choosing us! We will get back to you soon."
       );
       setConfirmBookingVisible(false);
       setModalVisible(false);
-
-      // Reset inputs after booking
-      setPatronName("");
-      setAddress("");
-      setMobileNumber("");
     } catch (error) {
       Alert.alert("Error", error.message || "Something went wrong.");
     } finally {
-      setLoading(false); // Hide loader after the request is completed
+      setLoading(false);
     }
   };
 
   const handleProceed = () => {
-    if (Object.keys(profile).length === 0) {
+    if (!Object.keys(profile).length) {
       Alert.alert(
         "Login Required",
         "Please log in to continue with your booking.",
@@ -142,16 +103,11 @@ const ServiceSelector = () => {
             text: "Proceed to Login",
             onPress: () => dispatch(screen(Route.LOGIN)),
           },
-          {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel",
-          },
+          { text: "Cancel", style: "cancel" },
         ]
       );
-      return; // Prevent proceeding if the user is not logged in
+      return;
     }
-
     setConfirmBookingVisible(true);
     setModalVisible(false);
   };
@@ -160,45 +116,59 @@ const ServiceSelector = () => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Request a Service</Text>
       <FlatList
-        data={availableServices}
+        data={services}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.serviceItem}
             onPress={() => handleServiceSelect(item)}
           >
-            <View style={styles.serviceIconContainer}>
-              <Ionicons name={item.icon} size={24} color="white" />
+            <View style={styles.serviceDetailsContainer}>
+              <Text style={styles.serviceText}>{item.serviceName}</Text>
+              <Text style={styles.priceText}>
+                {`Price: ₹${item.priceINR} / $${item.priceUSD}`}
+              </Text>
+              <Text style={styles.frequencyText}>
+                {item.frequencyUnit
+                  ? `Frequency: ${item.frequencyUnit}`
+                  : "No set frequency"}
+              </Text>
             </View>
-            <Text style={styles.serviceText}>{item.service}</Text>
           </TouchableOpacity>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.serviceID.toString()}
         contentContainerStyle={styles.list}
       />
 
-      {modalVisible && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
+      {/* Service Modal */}
+      {modalVisible && selectedService && (
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedService.service}</Text>
-              <Text style={styles.modalCost}>Cost: {selectedService.cost}</Text>
-
-              <ScrollView style={styles.modalDetailsContainer}>
-                <Text style={styles.modalDetails}>
-                  {selectedService.details}
-                </Text>
-              </ScrollView>
+              <Text style={styles.modalTitle}>
+                {selectedService.serviceName}
+              </Text>
+              <Text style={styles.modalDescription}>
+                {selectedService.serviceDescription}
+              </Text>
+              <Text style={styles.modalCost}>
+                Price: ₹{selectedService.priceINR} / ${selectedService.priceUSD}
+              </Text>
+              <Text style={styles.modalDetails}>
+                Business Hours: {selectedService.businessHoursStart} to{" "}
+                {selectedService.businessHoursEnd}
+              </Text>
 
               <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={handleProceed}>
-                  <Text style={styles.buttonText}>Proceed to Booking</Text>
+                <TouchableOpacity
+                  onPress={handleProceed}
+                  style={styles.proceedButton}
+                >
+                  <Text style={styles.buttonText}>Proceed</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.cancelButton}
+                >
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -207,43 +177,19 @@ const ServiceSelector = () => {
         </Modal>
       )}
 
-      {confirmBookingVisible && (
+      {/* Confirm Booking Modal */}
+      {confirmBookingVisible && selectedService && (
         <Modal
           animationType="slide"
           transparent={true}
           visible={confirmBookingVisible}
-          onRequestClose={() => setConfirmBookingVisible(false)}
         >
           <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>
-                  Schedule {selectedService.service}
+                  Schedule {selectedService.serviceName}
                 </Text>
-
-                {/* <TextInput
-                  style={styles.input}
-                  placeholder="Patron Name"
-                  value={patronName}
-                  onChangeText={setPatronName}
-                  placeholderTextColor="#aaa"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Address"
-                  value={address}
-                  onChangeText={setAddress}
-                  placeholderTextColor="#aaa"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Mobile Number"
-                  keyboardType="phone-pad"
-                  value={mobileNumber}
-                  onChangeText={setMobileNumber}
-                  placeholderTextColor="#aaa"
-                /> */}
-
                 <TouchableOpacity
                   onPress={() => setShowPicker(true)}
                   style={styles.datePickerButton}
@@ -263,13 +209,17 @@ const ServiceSelector = () => {
                 )}
 
                 <View style={styles.buttonContainer}>
-                  <TouchableOpacity onPress={handleConfirm}>
+                  <TouchableOpacity
+                    onPress={handleConfirm}
+                    style={styles.proceedButton}
+                  >
                     <Text style={styles.confirmButtonText}>
                       {loading ? <ActivityIndicator /> : "Confirm Booking"}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setConfirmBookingVisible(false)}
+                    style={styles.cancelButton}
                   >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                   </TouchableOpacity>
@@ -289,13 +239,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9fd", // Light background color
   },
   title: {
-    fontSize: 20,
-    fontWeight: "400",
-    marginVertical: 20,
+    fontSize: 26, // Bigger title
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 20,
     textAlign: "center",
+    fontFamily: FontFamily.poppinsRegular,
   },
   list: {
     paddingBottom: 20,
@@ -304,93 +256,80 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#ffffff",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: 20,
+    borderRadius: 15,
+    margin: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  serviceIconContainer: {
-    backgroundColor: Color.appDefaultColor,
-    padding: 10,
-    borderRadius: 10,
-    marginRight: 15,
+  serviceDetailsContainer: {
+    flex: 1,
   },
   serviceText: {
     fontSize: 18,
-    color: "#333",
-    flex: 1,
+    fontWeight: "600",
+    color: Color.appDefaultColor,
+    marginBottom: 5,
+  },
+  priceText: {
+    fontSize: 14,
+    color: "#777",
+    marginBottom: 5,
+  },
+  frequencyText: {
+    fontSize: 12,
+    color: "#999",
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker background for better focus on the modal
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   modalContent: {
-    width: "85%", // Slightly narrower for a more compact look
-    backgroundColor: "white",
-    borderRadius: 20, // Rounded corners for a softer appearance
-    padding: 25, // More padding for spacious layout
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 25,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 }, // More pronounced shadow for depth
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 10, // Soft shadow for a polished look
+    shadowRadius: 10,
     elevation: 10,
   },
   modalTitle: {
-    fontSize: 24, // Larger font for the title
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 15, // More spacing below the title
+    marginBottom: 15,
+    color: "#333",
     textAlign: "center",
-    color: "#333", // Darker text color for better readability
-  },
-  modalCost: {
-    fontSize: 18, // Slightly larger cost text
-    color: "#666",
-    marginBottom: 20, // Extra space below cost to separate it from details
-    textAlign: "center",
-    fontWeight: "600",
-  },
-  modalDetailsContainer: {
-    maxHeight: 150, // Constrain height to ensure it doesn’t overflow
-    marginBottom: 20, // Space between details and buttons
-  },
-  modalDetails: {
-    fontSize: 16, // Increased font size for better readability
-    color: "#555", // Softer color for details
-    textAlign: "justify", // Justify text for a clean edge
-    lineHeight: 24, // Line height for improved readability
   },
   modalDescription: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 5,
-    paddingHorizontal: 10,
     fontSize: 16,
-    color: "#333",
-  },
-  inputLabel: {
-    fontSize: 12,
     color: "#555",
+    textAlign: "justify",
+    marginBottom: 10,
+    lineHeight: 24,
+  },
+  modalCost: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 10,
+  },
+  modalDetails: {
+    fontSize: 14,
+    color: "#777",
     marginBottom: 15,
   },
   datePickerButton: {
-    backgroundColor: "#ddd",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 5,
+    backgroundColor: "#efefef",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 20,
     alignItems: "center",
   },
   datePickerText: {
@@ -400,24 +339,33 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
   },
-  button: {
+  proceedButton: {
+    padding: 12,
+    borderRadius: 10,
     flex: 1,
-    padding: 5, // Slightly larger padding for better tap target
-    borderRadius: 10, // Rounded corners for buttons
+    width: 300,
+
     alignItems: "center",
-    marginHorizontal: 5,
-  },
-  confirmButton: {
-    backgroundColor: Color.appDefaultColor, // Professional green for confirmation
   },
   cancelButton: {
-    backgroundColor: "black", // Professional red for cancellation
+    padding: 12,
+    borderRadius: 10,
+    flex: 1,
+    alignItems: "center",
   },
   buttonText: {
-    color: "black",
-    fontSize: 17,
+    color: Color.appDefaultColor,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  confirmButtonText: {
+    color: Color.appDefaultColor,
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  cancelButtonText: {
+    color: "red",
+    fontSize: 16,
   },
 });

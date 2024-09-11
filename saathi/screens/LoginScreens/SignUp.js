@@ -11,15 +11,13 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
   Pressable,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import Icon from "react-native-vector-icons/FontAwesome";
+
 import { Color, FontFamily } from "../../GlobalStyles";
 import { StatusBar } from "expo-status-bar";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const { width, height } = Dimensions.get("window");
 import { useDispatch } from "react-redux";
 import { Route } from "../../routes";
@@ -51,8 +49,9 @@ export default function SignUp({ navigation }) {
       firstName: firstName,
       lastName: lastName,
       email: email,
-      phoneNumber: number,
+      contactNo: number,
       password: password,
+      packageServiceID: 1,
     };
 
     try {
@@ -75,13 +74,16 @@ export default function SignUp({ navigation }) {
       dispatch(screen(Route.MAIN));
 
       if (response.ok) {
-        Alert.alert("Your request has been Submitted !","We will get back to you shortly" );
+        Alert.alert(
+          "Your request has been Submitted !",
+          "We will get back to you shortly"
+        );
         // You can navigate to another screen or perform other actions
       } else {
         Alert.alert("Error", json.message || "Please Fill all the fields");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error occured", error);
       Alert.alert("Error", "An error occurred. Please Fill all the forms");
     }
   };
@@ -177,6 +179,19 @@ export default function SignUp({ navigation }) {
             <TouchableOpacity style={styles.login} onPress={handleSubmit}>
               <Text style={styles.loginText}>Sign Up</Text>
             </TouchableOpacity>
+            <Pressable
+              onPress={() => navigation.navigate(Route.LOGIN)}
+              style={{ marginTop: 15, alignItems: "center" }}
+            >
+              <Text
+                style={{
+                  color: Color.colorDarkslategray,
+                  fontFamily: FontFamily.poppinsRegular,
+                }}
+              >
+                Already Have an Account?
+              </Text>
+            </Pressable>
           </View>
         </View>
         <Pressable

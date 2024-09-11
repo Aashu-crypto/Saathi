@@ -41,7 +41,7 @@ const Account = ({ navigation }) => {
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <HeaderComponent title={"Profile"} />
 
-      <ScrollView style={{ marginHorizontal: 10, flex: 1 }}>
+      <ScrollView style={{ marginHorizontal: 10, flex: 1 ,marginTop:20}}>
         {/* Commented out section; not relevant to map function focus */}
         <View
           style={{
@@ -49,7 +49,7 @@ const Account = ({ navigation }) => {
             alignItems: "center",
             flexDirection: "row",
             gap: 10,
-            marginVertical: 10,
+            marginVertical: 15,
           }}
         >
           <User />

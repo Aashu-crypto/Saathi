@@ -40,13 +40,13 @@ export default HeaderComponent;
 
 const styles = StyleSheet.create({
   feedHeader: {
-    height: 90,
+    height: 80,
     width: width,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
 
     alignItems: "center",
-    marginTop: Platform.OS == "android" && 25,
+    marginTop: Platform.OS == "android" && 30,
   },
   read: {
     color: Color.colorDarkslategray,
