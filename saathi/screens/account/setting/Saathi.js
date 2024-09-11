@@ -54,7 +54,7 @@ const Saathi = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <HeaderComponent title="Your Saathi" />
+
       {saathi ? (
         <CompanionCard
           companion={{

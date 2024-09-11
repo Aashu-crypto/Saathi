@@ -37,7 +37,7 @@ const BottomTab = () => {
         name={Route.SERVICE_STACK}
         component={Service}
         options={{
-          title: "Services",
+     
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="briefcase"

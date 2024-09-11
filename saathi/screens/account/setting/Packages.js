@@ -17,7 +17,7 @@ const MyPackage = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <HeaderComponent title={"Your Package Details"} />
+   
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.packageContainer}>
           <View style={styles.header}>
