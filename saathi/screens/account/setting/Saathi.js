@@ -19,14 +19,15 @@ const Saathi = () => {
   const [saathi, setSaathi] = useState(null);
   const profile = useSelector((state) => state.profile.data);
   const id = profile?.subscriberID;
+  console.log("id", id);
 
   useEffect(() => {
     const fetchSaathiData = async () => {
       try {
-        const response = await fetch(`${BACKEND_HOST}subscribers/${id}/saathi`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
+        const response = await fetch(
+          `${BACKEND_HOST}/subscribers/${id}/saathi`
+        );
+
         const data = await response.json();
         setSaathi(data);
       } catch (error) {
@@ -54,7 +55,6 @@ const Saathi = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-
       {saathi ? (
         <CompanionCard
           companion={{

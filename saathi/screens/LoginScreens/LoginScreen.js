@@ -13,6 +13,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 
 import { Color, FontFamily } from "../../GlobalStyles";
@@ -36,15 +37,18 @@ export default function LoginScreen({ navigation }) {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+  const [loader, setLoader] = useState("");
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Please fill all the forms before Submiting");
+      Alert.alert("Please fill out all the forms before submitting");
       return;
     }
+    setLoader(true);
     const formData = new FormData();
     formData.append("email", email.trim()); // Trim whitespace from email input
     formData.append("password", password);
+    console.log("formData", formData);
 
     try {
       const response = await fetch(
@@ -68,18 +72,17 @@ export default function LoginScreen({ navigation }) {
       const json = await response.json();
       console.log("Login successful:", json);
 
-      // Save email to AsyncStorage
-      await AsyncStorage.setItem("Email", email);
       dispatch(profileData(json));
 
       // Navigate to the main screen
       dispatch(screen(Route.MAIN));
-
+      setLoader(true);
       // Optionally, clear the input fields after successful login
       setEmail("");
       setPassword("");
     } catch (error) {
       console.error("Error during login:", error);
+      setLoader(true);
       Alert.alert(
         "Login Error",
         "An error occurred during the login process. Please check your network connection and try again."
@@ -132,30 +135,32 @@ export default function LoginScreen({ navigation }) {
               </TouchableOpacity>
             </KeyboardAvoidingView>
 
-            {!isLoaded ? (
-              <>
-                <TouchableOpacity style={styles.login} onPress={handleLogin}>
-                  <Text style={styles.loginText}>Login</Text>
-                </TouchableOpacity>
-
-                <Pressable
-                  onPress={() => {
-                    navigation.navigate(Route.SIGNUP);
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.termsLink,
-                      { textAlign: "center", marginTop: 15 },
-                    ]}
-                  >
-                    Create Account
+            <>
+              <TouchableOpacity style={styles.login} onPress={handleLogin}>
+                {loader ? (
+                  <Text style={styles.loginText}>
+                    Please wait... <ActivityIndicator />{" "}
                   </Text>
-                </Pressable>
-              </>
-            ) : (
-              <ContentLoader />
-            )}
+                ) : (
+                  <Text style={styles.loginText}>Login</Text>
+                )}
+              </TouchableOpacity>
+
+              <Pressable
+                onPress={() => {
+                  navigation.navigate(Route.SIGNUP);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.termsLink,
+                    { textAlign: "center", marginTop: 15 },
+                  ]}
+                >
+                  Create Account
+                </Text>
+              </Pressable>
+            </>
           </View>
         </View>
         <Pressable

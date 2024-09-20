@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -26,11 +26,13 @@ import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Accordion from "../Accordion";
+import { subscriptionPackages } from "../../Redux/Slice/packageSlice";
 const itemWidth = width / 1.5;
 
 const Packages = () => {
   const scrollY = useSharedValue(0);
   const dispatch = useDispatch();
+
   useEffect(() => {
     const interval = setInterval(() => {
       currentIndex.current = (currentIndex.current + 1) % testimonials.length;
@@ -70,41 +72,84 @@ const Packages = () => {
       rating: 5,
     },
   ];
-  const packages = [
-    {
-      id: "1",
-      title: "Basic",
-      description: `• One-hour call with patrons every week.\n• Includes one in-home visit to check health, take a photo, and ensure well-being.`,
-      price: "$30/m\n(Rs. 2500/m)",
-      icon: "star-outline",
-      colors: ["rgba(186, 220, 188, 0.8)", "#4CAF50"], // Light mint green with dark green border
-    },
-    {
-      id: "2",
-      title: "Bronze",
-      description: `• One-hour call with patrons every week.\n• Two in-home visits to check health, take a photo, and ensure well-being.`,
-      price: "$40/m\n(Rs. 3500/m)",
-      icon: "medal-outline",
-      colors: ["rgba(255, 224, 178, 0.8)", "#FFA726"], // Soft peach with deep orange border
-    },
-    {
-      id: "3",
-      title: "Silver",
-      description: `• One-hour call with patrons every week.\n• Weekly in-home visits to check health, take a photo, and ensure well-being.`,
-      price: "$60/m\n(Rs. 5000/m)",
-      icon: "trophy-outline",
-      colors: ["rgba(178, 235, 242, 0.8)", "#00ACC1"], // Light aqua with dark teal border
-    },
-    {
-      id: "4",
-      title: "Gold",
-      description: `• One-hour call with patrons every week.\n• Weekly in-home visits to check health, take a photo, and ensure well-being.`,
-      price: "$80/m\n(Rs. 6500/m)",
-      icon: "ribbon-outline",
-      colors: ["rgba(244, 213, 178, 0.8)", "#FF9800"], // Light sand with burnt orange border
-    },
-  ];
+  const [packages, setPackages] = useState([]);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await fetch(
+          "https://saathi.etheriumtech.com:444/Saathi/subscription-package/active"
+        );
+        const data = await response.json();
+        dispatch(subscriptionPackages(data));
+        // Check if data is an array and has valid content
+        if (Array.isArray(data)) {
+          setPackages(data);
+        } else {
+          console.error("Unexpected data format:", data);
+          setError("Unexpected data format from the server.");
+        }
+      } catch (error) {
+        console.error("Error fetching packages:", error);
+        setError("Error fetching packages. Please try again later.");
+      }
+    };
+    fetchPackages();
+  }, []);
+  function Item({ item }) {
+    return (
+      <View
+        style={[
+          styles.item,
+          {
+            backgroundColor: "#fff",
+            borderLeftColor: Color.appDefaultColor,
+            borderLeftWidth: 8,
+            alignItems: "center",
+          },
+        ]}
+      >
+        <View style={styles.content}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Ionicons
+              name="pricetag-outline"
+              size={20}
+              color={Color.appDefaultColor}
+              style={{ marginRight: 5 }}
+            />
+            <Text style={styles.title}>{item.packageName}</Text>
+          </View>
 
+          {item.packageServices.map((service, index) => (
+            <View key={index} style={styles.serviceItem}>
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={16}
+                color={Color.appDefaultColor}
+              />
+              <Text style={styles.serviceName}>
+                {service.serviceName} ({service.frequency}x per month)
+              </Text>
+            </View>
+          ))}
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.price}>
+            {item.priceUSD
+              ? `$${item.priceUSD.toFixed(2)}`
+              : `₹${item.priceINR}`}
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: Color.appDefaultColor }]}
+            onPress={() => handlePress(item)}
+          >
+            <Text style={styles.buttonText}>Subscribe Now</Text>
+            <AntDesign name="right" size={16} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
   const keyValues = [
     {
       icon: "heart-outline",
@@ -136,40 +181,6 @@ const Packages = () => {
     dispatch(screen(Route.LOGIN));
   };
 
-  function Item({ index, scrollY, item }) {
-    return (
-      <View
-        style={[
-          styles.item,
-          {
-            backgroundColor: item.colors[0],
-            borderLeftColor: item.colors[1],
-            borderLeftWidth: 8,
-            alignItems: "center",
-          },
-        ]}
-      >
-        <View style={styles.content}>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={styles.title}>{item.title}</Text>
-          </View>
-
-          <View style={styles.divider} />
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.price}>{item.price}</Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: item.colors[1] }]}
-            onPress={() => handlePress(item)}
-          >
-            <Text style={styles.buttonText}>Subscribe Now</Text>
-            <AntDesign name="right" size={16} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
   const flatListRef = useRef(null);
   const currentIndex = useRef(0);
 
@@ -255,13 +266,13 @@ const Packages = () => {
       <Text style={styles.header}>Explore our Packages</Text>
       <FlatList
         data={packages}
-        horizontal
-        renderItem={({ item, index }) => <Item index={index} item={item} />}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <Item item={item} />}
+        keyExtractor={(item) => item.packageID}
         contentContainerStyle={styles.list}
-        decelerationRate="fast"
+        horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       />
       {Object.keys(profile).length === 0 && <Accordion />}
     </ScrollView>
@@ -298,44 +309,47 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
-  },
-  iconContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 15,
+    elevation: 5,
   },
   content: {
     flex: 1,
     justifyContent: "center",
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "600",
     color: "#1F2937",
     marginBottom: 10,
-
-    letterSpacing: 1.2,
+    letterSpacing: 1.1,
     textAlign: "left",
-  },
-  price: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#1F2937",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  divider: {
-    height: 1,
-    width: "100%",
-    backgroundColor: "#E5E7EB",
-    marginVertical: 10,
   },
   description: {
     fontSize: 14,
     color: "#4B5563",
     textAlign: "left",
-    marginBottom: 20,
-    lineHeight: 24,
+    marginBottom: 10,
+    lineHeight: 22,
+  },
+  servicesContainer: {
+    marginTop: 15,
+  },
+  serviceItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  serviceName: {
+    fontSize: 12,
+    marginLeft: 10,
+    color: "#333",
+    width:'90%'
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1F2937",
+    marginBottom: 10,
+    textAlign: "center",
   },
   button: {
     borderRadius: 25,
@@ -352,11 +366,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600",
-
-    letterSpacing: 1.1,
-    textAlign: "center",
+    marginRight: 5,
   },
   keyValueTitle: {
     fontSize: 15,

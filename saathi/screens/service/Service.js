@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
-  ScrollView,
   SafeAreaView,
   Alert,
   ActivityIndicator,
@@ -17,9 +16,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
-import { BACKEND_HOST } from "../../config"; // Assuming your config has BACKEND_HOST
+import { BACKEND_HOST } from "../../config";
 import { Color, FontFamily } from "../../GlobalStyles";
-
+import Feather from "@expo/vector-icons/Feather";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 const ServiceSelector = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,33 +33,14 @@ const ServiceSelector = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile.data || {});
-
-  // Fetch services from the API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${BACKEND_HOST}/alacarteservices`);
-        const data = await response.json();
-
-        setServices(data);
-      } catch (error) {
-        Alert.alert("Error Occured", error.message);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const handleServiceSelect = (service) => {
-    setSelectedService(service);
-    setModalVisible(true);
-  };
+  const id = profile.subscriberID;
+  console.log("profile", profile);
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowPicker(false);
     setDate(currentDate);
   };
-
   const handleConfirm = async () => {
     if (!selectedService) return;
 
@@ -65,9 +49,9 @@ const ServiceSelector = () => {
       serviceDate: date.toISOString().split("T")[0],
       serviceTime: date.toTimeString().split(" ")[0],
       billingStatus: 1,
-      isAccepted: true,
-      subscriberID: profile.subscriberID,
+      subscriberID: profile.subscriberId,
     };
+    console.log("booking Details", bookingDetails);
 
     try {
       setLoading(true);
@@ -92,6 +76,50 @@ const ServiceSelector = () => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BACKEND_HOST}/alacarteservices/active`);
+        const data = await response.json();
+        setServices(data);
+      } catch (error) {
+        Alert.alert("Error Occurred", error.message);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleServiceSelect = (service) => {
+    setSelectedService(service);
+    setModalVisible(true);
+  };
+
+  const renderIcon = (serviceName) => {
+    switch (serviceName) {
+      case "Phone Call":
+        return (
+          <Feather name="phone-call" size={28} color={Color.appDefaultColor} />
+        );
+      case "House Visit":
+        return (
+          <AntDesign name="home" size={28} color={Color.appDefaultColor} />
+        );
+      case "Running Errands":
+        return (
+          <MaterialCommunityIcons
+            name="bike-fast"
+            size={28}
+            color={Color.appDefaultColor}
+          />
+        );
+      case "Destination Drive":
+        return <AntDesign name="car" size={28} color={Color.appDefaultColor} />;
+      default:
+        return (
+          <Feather name="help-circle" size={28} color={Color.appDefaultColor} />
+        );
+    }
+  };
 
   const handleProceed = () => {
     if (!Object.keys(profile).length) {
@@ -111,10 +139,8 @@ const ServiceSelector = () => {
     setConfirmBookingVisible(true);
     setModalVisible(false);
   };
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Request a Service</Text>
       <FlatList
         data={services}
         renderItem={({ item }) => (
@@ -122,58 +148,86 @@ const ServiceSelector = () => {
             style={styles.serviceItem}
             onPress={() => handleServiceSelect(item)}
           >
+            <View style={styles.serviceIconContainer}>
+              {renderIcon(item.serviceName)}
+            </View>
             <View style={styles.serviceDetailsContainer}>
               <Text style={styles.serviceText}>{item.serviceName}</Text>
               <Text style={styles.priceText}>
-                {`Price: ₹${item.priceINR} / $${item.priceUSD}`}
+                ₹{item.priceINR} / ${item.priceUSD}
               </Text>
-              <Text style={styles.frequencyText}>
-                {item.frequencyUnit
-                  ? `Frequency: ${item.frequencyUnit}`
-                  : "No set frequency"}
+              <Text style={styles.descriptionText}>
+                {item.serviceDescription}
               </Text>
             </View>
+            <Feather
+              name="chevron-right"
+              size={24}
+              color={Color.appDefaultColor}
+            />
           </TouchableOpacity>
         )}
-        keyExtractor={(item) => item.serviceID.toString()}
+        keyExtractor={(item) => item.serviceID}
         contentContainerStyle={styles.list}
       />
 
       {/* Service Modal */}
       {modalVisible && selectedService && (
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                {selectedService.serviceName}
-              </Text>
-              <Text style={styles.modalDescription}>
-                {selectedService.serviceDescription}
-              </Text>
-              <Text style={styles.modalCost}>
-                Price: ₹{selectedService.priceINR} / ${selectedService.priceUSD}
-              </Text>
-              <Text style={styles.modalDetails}>
-                Business Hours: {selectedService.businessHoursStart} to{" "}
-                {selectedService.businessHoursEnd}
-              </Text>
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  <FontAwesome
+                    name="info-circle"
+                    size={22}
+                    color={Color.appDefaultColor}
+                  />{" "}
+                  {selectedService.serviceName}
+                </Text>
+                <Text style={styles.modalDescription}>
+                  {selectedService.serviceDescription}
+                </Text>
+                <Text style={styles.modalCost}>
+                  Price: ₹{selectedService.priceINR} / $
+                  {selectedService.priceUSD}
+                </Text>
+                {/* <Text style={styles.modalDetails}>
+                  <Feather
+                    name="clock"
+                    size={16}
+                    color={Color.appDefaultColor}
+                  />{" "}
+                  Business Hours: {selectedService.businessHoursStart} to{" "}
+                  {selectedService.businessHoursEnd}
+                </Text> */}
 
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  onPress={handleProceed}
-                  style={styles.proceedButton}
-                >
-                  <Text style={styles.buttonText}>Proceed</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={styles.cancelButton}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={handleProceed}
+                    style={[styles.proceedButton, styles.modalProceedButton]}
+                  >
+                    <Text style={styles.buttonText}>
+                      <Feather
+                        name="check-circle"
+                        size={16}
+                        color={Color.appDefaultColor}
+                      />{" "}
+                      Proceed
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={styles.cancelButton}
+                  >
+                    <Text style={styles.cancelButtonText}>
+                      <Feather name="x-circle" size={16} color="red" /> Cancel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
       )}
 
@@ -188,6 +242,12 @@ const ServiceSelector = () => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>
+                  <FontAwesome
+                    name="calendar"
+                    size={22}
+                    color={Color.appDefaultColor}
+                    style={{ marginRight: 10 }}
+                  />{" "}
                   Schedule {selectedService.serviceName}
                 </Text>
                 <TouchableOpacity
@@ -211,17 +271,28 @@ const ServiceSelector = () => {
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={handleConfirm}
-                    style={styles.proceedButton}
+                    style={[styles.proceedButton, styles.modalProceedButton]}
                   >
                     <Text style={styles.confirmButtonText}>
-                      {loading ? <ActivityIndicator /> : "Confirm Booking"}
+                      {loading ? (
+                        <ActivityIndicator />
+                      ) : (
+                        <Feather
+                          name="check-circle"
+                          size={16}
+                          color={Color.appDefaultColor}
+                        />
+                      )}{" "}
+                      Confirm
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setConfirmBookingVisible(false)}
                     style={styles.cancelButton}
                   >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <Text style={styles.cancelButtonText}>
+                      <Feather name="x-circle" size={16} color="red" /> Cancel
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -239,72 +310,81 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f9fd", // Light background color
+    backgroundColor: "#fff", // Softer background color for a professional look
   },
-  title: {
-    fontSize: 26, // Bigger title
-    fontWeight: "500",
-    color: "#333",
-    marginBottom: 20,
-    textAlign: "center",
-    fontFamily: FontFamily.poppinsRegular,
-  },
+
   list: {
     paddingBottom: 20,
+    marginTop: 20,
   },
   serviceItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 15,
-    margin: 15,
+    marginHorizontal: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
+    marginVertical: 10,
     elevation: 3,
+  },
+  serviceIconContainer: {
+    marginRight: 15,
+    padding: 10,
+    backgroundColor: Color.lightOrange,
+    borderRadius: 10,
   },
   serviceDetailsContainer: {
     flex: 1,
+    marginRight: 10,
   },
   serviceText: {
     fontSize: 18,
-    fontWeight: "600",
-    color: Color.appDefaultColor,
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 5,
   },
   priceText: {
-    fontSize: 14,
-    color: "#777",
+    fontSize: 16,
+    color: "#555",
     marginBottom: 5,
   },
-  frequencyText: {
-    fontSize: 12,
-    color: "#999",
+  descriptionText: {
+    fontSize: 14,
+    color: "#777",
+  },
+  iconPosition: {
+    position: "absolute",
+    top: -14,
+    right: 5,
+    backgroundColor: Color.appDefaultColor,
+    borderRadius: 14,
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background for focus
   },
   modalContent: {
     width: "90%",
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderRadius: 15,
     padding: 25,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
-    elevation: 10,
+    elevation: 8,
   },
   modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
     marginBottom: 15,
-    color: "#333",
+    color: Color.colorDarkslategray,
     textAlign: "center",
   },
   modalDescription: {
@@ -312,7 +392,7 @@ const styles = StyleSheet.create({
     color: "#555",
     textAlign: "justify",
     marginBottom: 10,
-    lineHeight: 24,
+    lineHeight: 22,
   },
   modalCost: {
     fontSize: 18,
@@ -326,7 +406,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   datePickerButton: {
-    backgroundColor: "#efefef",
+    backgroundColor: "#f0f0f0",
     padding: 12,
     borderRadius: 10,
     marginBottom: 20,
@@ -341,31 +421,32 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   proceedButton: {
-    padding: 12,
+    padding: 15,
     borderRadius: 10,
-    flex: 1,
-    width: 300,
-
     alignItems: "center",
+    marginRight: 10,
+    flex: 1,
   },
+  modalProceedButton: {},
   cancelButton: {
-    padding: 12,
+    padding: 15,
     borderRadius: 10,
-    flex: 1,
     alignItems: "center",
+    flex: 1,
   },
   buttonText: {
     color: Color.appDefaultColor,
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   confirmButtonText: {
     color: Color.appDefaultColor,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   cancelButtonText: {
-    color: "red",
+    color: "#ff5c5c",
     fontSize: 16,
+    fontWeight: "600",
   },
 });

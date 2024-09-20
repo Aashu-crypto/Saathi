@@ -14,21 +14,21 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import OptionSlice from "./Slice/OptionSlice";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import heightSlice from "./Slice/heightSlice";
 import articleIdSlice from "./Slice/ArticleIdSlice";
 import { tokenSlice } from "./Slice/TokenSlice";
+import packageSlice from "./Slice/packageSlice";
 const rootReducer = combineReducers({
   screen: screenSlice,
   height: heightSlice,
   index: indexSlice,
   doc: docSlice,
-  option: OptionSlice,
+  subscriptionPackages: packageSlice,
   profile: profileSlice,
   articleId: articleIdSlice,
   booking: BookingSlice,
-
 });
 
 const persistConfig = {

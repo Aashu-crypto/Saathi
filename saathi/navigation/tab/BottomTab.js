@@ -24,6 +24,7 @@ const BottomTab = () => {
         component={FeedStack}
         options={{
           title: "Home",
+
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="home"
@@ -37,7 +38,16 @@ const BottomTab = () => {
         name={Route.SERVICE_STACK}
         component={Service}
         options={{
-     
+          title: "Schedule Services",
+          headerShown: true,
+          headerTitleAlign: "center",
+
+          headerTitleStyle: {
+            fontFamily: "Dream-Orphans-bd",
+            color: Color.appDefaultColor,
+            letterSpacing: 2,
+            fontSize: 25,
+          },
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="briefcase"

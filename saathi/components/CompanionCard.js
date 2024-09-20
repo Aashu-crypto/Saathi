@@ -9,17 +9,24 @@ const CompanionCard = ({ companion }) => {
     <View style={styles.cardContainer}>
       <View style={styles.header}>
         {companion.Picture === null ? (
-          <View style={{marginRight:10}}> 
+          <View style={{ marginRight: 10 }}>
             <User />
           </View>
         ) : (
-          <Image source={{ uri: companion.Picture }} style={styles.image} />
+          <Image
+            source={{
+              uri: "https://saathi.etheriumtech.com:444/saathi_images/1488(2).jpg",
+            }}
+            style={styles.image}
+          />
         )}
 
         <View style={styles.infoContainer}>
-          <Text
-            style={styles.name}
-          >{`${companion.FirstName} ${companion.LastName}`}</Text>
+          <Text style={styles.name}>
+            {" "}
+            <Text style={{ fontWeight: "400", fontSize: 14 }}>Name:-</Text>{" "}
+            {`${companion.FirstName} ${companion.LastName}`}
+          </Text>
           <Text style={styles.email}>{companion.Email}</Text>
           <View style={styles.contactContainer}>
             <Ionicons
@@ -52,7 +59,7 @@ const CompanionCard = ({ companion }) => {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: "#FFF",
+    backgroundColor: Color.lightOrange,
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
@@ -80,14 +87,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: Color.appDefaultColor,
+    fontSize: 18,
+    fontWeight: "700",
+    color: Color.colorDarkslategray,
     marginBottom: 2,
   },
   email: {
     fontSize: 16,
-    color: Color.appDefaultColor,
+    color: Color.colorDarkslategray,
     marginBottom: 4,
   },
   contactContainer: {
@@ -97,22 +104,22 @@ const styles = StyleSheet.create({
   },
   contactNo: {
     fontSize: 16,
-    color: Color.appDefaultColor,
+    color: Color.colorDarkslategray,
     marginLeft: 5,
   },
   userType: {
     fontSize: 16,
     fontWeight: "bold",
-    color: Color.appDefaultColor,
+    color: Color.colorDarkslategray,
   },
   dob: {
     fontSize: 16,
-    color: Color.appDefaultColor,
+    color: Color.colorDarkslategray,
     marginBottom: 10,
   },
   briefBio: {
     fontSize: 15,
-    color: Color.appDefaultColor,
+    color: Color.colorDarkslategray,
     lineHeight: 22,
   },
 });
