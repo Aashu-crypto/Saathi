@@ -1,33 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  ImageBackground,
-} from "react-native";
+import { FlatList, StyleSheet, Text, View, Image } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Color, FontFamily, width } from "../../GlobalStyles";
+import Icon from "@expo/vector-icons/Ionicons"; // Imported to handle icons
 
-import Icon from "@expo/vector-icons/Ionicons";
-import { Color, FontFamily, height, width } from "../../GlobalStyles";
-
-import ServicesTaken from "../../components/feedComponents/ServicesTaken";
-import { StatusBar } from "expo-status-bar";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import { useFocusEffect } from "@react-navigation/native";
-
-import { useSelector } from "react-redux";
-import HomeScreen from "../../components/feedComponents/HomeScreen";
-
-const Feed = () => {
-  const currentRef = useRef(0);
+const Testimonials = () => {
   const flatListRef = useRef(null);
   const currentIndex = useRef(0);
-
 
   const testimonials = [
     {
@@ -72,22 +50,11 @@ const Feed = () => {
     },
   ];
 
-  const [mail, setMail] = useState();
-  const profile = useSelector((state) => state.profile.data || {});
-  useEffect(() => {
-    const fetch = async () => {
-      const mail = await AsyncStorage.getItem("Email");
-      console.log("My Mail", mail);
-      setMail(mail);
-    };
-    fetch();
-  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       currentIndex.current = (currentIndex.current + 1) % testimonials.length;
 
       if (flatListRef.current) {
-        // Check if the ref is available
         flatListRef.current.scrollToIndex({
           index: currentIndex.current,
           animated: true,
@@ -96,10 +63,10 @@ const Feed = () => {
     }, 2500); // Auto-slide interval in milliseconds
 
     return () => clearInterval(interval); // Clear the interval on unmount
-  }, []);
+  }, [testimonials.length]);
 
   const TestimonialItem = ({ item }) => (
-    <View style={{ flex: 1, width: width * 0.95 }}>
+    <View style={styles.testimonialItem}>
       <View style={styles.testimonialContainer}>
         <Image source={{ uri: item.avatar }} style={styles.avatar} />
         <View style={styles.textContainer}>
@@ -114,39 +81,85 @@ const Feed = () => {
       </View>
     </View>
   );
+
   return (
-    <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
-      <StatusBar style="dark" />
-
-      {/* <ServiceSelector/> */}
-      {Object.keys(profile).length !== 0 && <ServicesTaken />}
-      {Object.keys(profile).length === 0 && <HomeScreen />}
-
-      {/* {Object.keys(profile).length !== 0 && <ServiceSelector />} */}
-      {/* <View style={styles.exploreButtons}>
-        {exploreOptions.map((option, index) => (
-          <TouchableOpacity key={index} style={styles.exploreButton}>
-            <Image
-              source={option.icon}
-              style={{
-                resizeMode: "contain",
-                height: height * 0.07,
-                width: width * 0.07,
-              }}
-            />
-            <Text style={styles.exploreButtonText}>{option.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </View> */}
-
-      {/* {Object.keys(profile).length === 0 && (
-      
-      )} */}
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.mainTitle}>Testimonials</Text>
+      <FlatList
+        data={testimonials}
+        ref={flatListRef}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <TestimonialItem item={item} />}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
+      />
+    </View>
   );
 };
 
-export default Feed;
+export default Testimonials;
+
 const styles = StyleSheet.create({
-  
+  container: {
+    paddingVertical: 20,
+  },
+  listContainer: {
+    paddingHorizontal: 10,
+  },
+  testimonialItem: {
+    width: width * 0.95,
+  },
+  testimonialContainer: {
+    flexDirection: "row",
+    backgroundColor: Color.lightOrange,
+    padding: 20,
+    marginVertical: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 5,
+    width: "95%",
+    marginHorizontal: 5,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  textContainer: {
+    marginLeft: 15,
+    justifyContent: "center",
+    flex: 1,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Color.appDefaultColor,
+  },
+  feedback: {
+    fontSize: 14,
+    color: "#666",
+    marginVertical: 5,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+  },
+  mainTitle: {
+    fontSize: 20,
+    fontWeight: "500",
+    textAlign: "center",
+    color: Color.appDefaultColor,
+    fontFamily: FontFamily.poppinsRegular,
+    backgroundColor: Color.lightOrange,
+    padding: 5,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: Color.appDefaultColor,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
 });

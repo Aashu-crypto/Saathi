@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Account from "../../screens/account/Account";
 import { Route } from "../../routes";
 import AboutUs from "../../screens/account/setting/AboutUs";
-import Packages from "../../components/feedComponents/Packages";
+import Packages from "../../components/feedComponents/HomeScreen";
 import Saathi from "../../screens/account/setting/Saathi";
 import YourPackages from "../../screens/account/setting/Packages";
 import { Color } from "../../GlobalStyles";

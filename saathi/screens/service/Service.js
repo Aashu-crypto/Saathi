@@ -49,7 +49,7 @@ const ServiceSelector = () => {
       serviceDate: date.toISOString().split("T")[0],
       serviceTime: date.toTimeString().split(" ")[0],
       billingStatus: 1,
-      subscriberID: profile.subscriberId,
+      subscriberID: profile.subscriberID,
     };
     console.log("booking Details", bookingDetails);
 
@@ -60,6 +60,7 @@ const ServiceSelector = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingDetails),
       });
+console.log("response booking",response);
 
       if (!response.ok)
         throw new Error("Failed to book the service. Please try again.");

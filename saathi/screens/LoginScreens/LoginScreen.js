@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   termsLink: {
     color: Color.appDefaultColor,
-    textDecorationLine: "underline",
+    
   },
   login: {
     backgroundColor: Color.appDefaultColor,

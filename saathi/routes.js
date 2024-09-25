@@ -7,6 +7,7 @@ export const Route = {
   //doctor screen and tab
 
   FEED: "FEED",
+  ARTICLES_READ:"ARTICLES_READ",
 
   //search screen and tab
   SEARCH: "SEARCH",
