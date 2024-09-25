@@ -45,7 +45,7 @@ const Feed = () => {
         `https://saathi.etheriumtech.com:444/Saathi/subscribers/active`
       );
       const json = await fet.json();
-      console.log(json);
+      console.log("log of feed",json);
     };
     fetchData();
   }, []);

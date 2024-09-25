@@ -96,51 +96,48 @@ const Packages = () => {
     };
     fetchPackages();
   }, []);
-  function Item({ item }) {
+  const renderItem = ({ item }) => {
     return (
-      <View
-        style={[
-          styles.item,
-          {
-            backgroundColor: "#fff",
-            borderLeftColor: Color.appDefaultColor,
-            borderLeftWidth: 8,
-            alignItems: "center",
-          },
-        ]}
-      >
-        <View style={styles.content}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Ionicons
-              name="pricetag-outline"
-              size={20}
-              color={Color.appDefaultColor}
-              style={{ marginRight: 5 }}
-            />
-            <Text style={styles.title}>{item.packageName}</Text>
-          </View>
+      <View style={styles.cardContainer}>
+        {/* Card Header */}
+        <View style={styles.header}>
+          <Ionicons
+            name="pricetag-outline"
+            size={24}
+            color={Color.appDefaultColor}
+          />
+          <Text style={styles.packageName}>{item.packageName}</Text>
+        </View>
 
+        {/* Services List */}
+        <View style={styles.servicesContainer}>
           {item.packageServices.map((service, index) => (
             <View key={index} style={styles.serviceItem}>
               <Ionicons
                 name="checkmark-circle-outline"
-                size={16}
+                size={20}
                 color={Color.appDefaultColor}
+                style={{ marginRight: 10 }}
               />
-              <Text style={styles.serviceName}>
-                {service.serviceName} ({service.frequency}x per month)
+              <Text style={styles.serviceText}>
+                {service.serviceName}{" "}
+                <Text style={styles.serviceFrequency}>
+                  ({service.frequency} times per {service.frequencyUnit})
+                </Text>
               </Text>
             </View>
           ))}
         </View>
-        <View style={{ flex: 1 }}>
+
+        {/* Price and Subscribe Button */}
+        <View style={styles.footer}>
           <Text style={styles.price}>
             {item.priceUSD
               ? `$${item.priceUSD.toFixed(2)}`
               : `₹${item.priceINR}`}
           </Text>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: Color.appDefaultColor }]}
+            style={styles.subscribeButton}
             onPress={() => handlePress(item)}
           >
             <Text style={styles.buttonText}>Subscribe Now</Text>
@@ -149,33 +146,35 @@ const Packages = () => {
         </View>
       </View>
     );
-  }
+  };
+
   const keyValues = [
     {
-      icon: "heart-outline",
-      title: "Companionship",
+      icon: "call-outline", // representing phone calls
+      title: "Regular Check-ins",
       color: "rgba(161, 214, 178, 0.4)",
-      text: "Saathis are more than assistants – they're friends who reduce loneliness.",
+      text: "Weekly calls to ensure the well-being of your loved ones and keep you updated.",
     },
     {
-      icon: "medkit-outline",
-      title: "Professional Care",
+      icon: "home-outline", // representing home visits
+      title: "Home Visits",
       color: "rgba(206, 223, 159, 0.4)",
-      text: "Our companions assist with conversations, tasks, and appointments.",
+      text: "Scheduled visits to house check on your family and share updates.",
     },
     {
-      icon: "shield-checkmark-outline",
-      title: "Trust and Reliability",
+      icon: "bicycle-outline", // representing errands
+      title: "Errand Assistance",
       color: "rgba(241, 243, 194, 0.4)",
-      text: "We keep you informed so you know your family is in good hands.",
+      text: "Running essential errands on behalf of your loved ones to make their lives easier.",
     },
     {
-      icon: "chatbubble-ellipses-outline",
-      title: "Effective Communication",
+      icon: "car-outline", // representing transportation
+      title: "Destination Drive",
       color: "rgba(232, 180, 184, 0.4)",
-      text: "Clear, compassionate communication in every interaction.",
+      text: "Safe and reliable transportation for your loved ones to appointments and events.",
     },
   ];
+
   const profile = useSelector((state) => state.profile.data);
   const handlePress = () => {
     dispatch(screen(Route.LOGIN));
@@ -188,24 +187,23 @@ const Packages = () => {
     <ScrollView style={styles.container}>
       <Text
         style={{
-          textAlign: "left",
+          textAlign: "center",
           paddingHorizontal: 15,
           fontWeight: "400",
-          color: Color.colorDarkslategray,
+          color: Color.colorGray,
 
           borderRadius: 10,
           padding: 5,
-          borderColor: Color.appDefaultColor,
-          fontSize: 15,
+
+          fontSize: 12,
+          lineHeight: 15,
         }}
       >
         Saathi provides a wide range of services to make life easier for your
-        loved ones and give you peace of mind. Whether it's providing emotional
-        support, managing daily tasks, or making sure health needs are met, we
-        are here to help.
+        loved ones and give you peace of mind.
       </Text>
-
-      <Text style={styles.header}>Membership Benefits</Text>
+      {Object.keys(profile).length === 0 && <Accordion />}
+      <Text style={styles.headerText}>Membership Benefits</Text>
       <View
         style={{
           flexWrap: "wrap",
@@ -243,7 +241,7 @@ const Packages = () => {
                   <Ionicons
                     name={item.icon}
                     size={14}
-                    color="#4A90E2"
+                    color={Color.appDefaultColor}
                     style={{ marginRight: 5 }}
                   />
                   <Text style={styles.keyValueTitle}>{item.title}</Text>
@@ -263,18 +261,13 @@ const Packages = () => {
         })}
       </View>
 
-      <Text style={styles.header}>Explore our Packages</Text>
+      <Text style={styles.headerText}>Explore our Packages</Text>
       <FlatList
         data={packages}
-        renderItem={({ item }) => <Item item={item} />}
-        keyExtractor={(item) => item.packageID}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.packageID.toString()}
         contentContainerStyle={styles.list}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
       />
-      {Object.keys(profile).length === 0 && <Accordion />}
     </ScrollView>
   );
 };
@@ -288,14 +281,122 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   header: {
-    fontSize: 22,
-    fontWeight: "600",
-    textAlign: "left",
+    fontSize: 20,
+    fontWeight: "500",
+    textAlign: "center",
     marginVertical: 20,
-    color: "#1F2937",
+    color: Color.appDefaultColor,
+    fontFamily: FontFamily.poppinsRegular,
+
+    textDecorationColor: Color.appDefaultColor,
+    backgroundColor: Color.lightOrange,
+    padding: 5,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: Color.appDefaultColor,
+    overflow: "hidden",
   },
   list: {
     alignSelf: "center",
+  },
+  introText: {
+    textAlign: "center",
+    paddingHorizontal: 15,
+    fontWeight: "400",
+    color: Color.colorGray,
+    borderRadius: 10,
+    padding: 5,
+    fontSize: 14,
+    lineHeight: 20,
+    marginVertical: 10,
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "500",
+    textAlign: "center",
+    marginVertical: 20,
+    color: Color.appDefaultColor,
+    fontFamily: FontFamily.poppinsRegular,
+    backgroundColor: Color.lightOrange,
+    padding: 5,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: Color.appDefaultColor,
+  },
+  list: {
+    alignItems: "center",
+    paddingBottom: 20,
+  },
+  cardContainer: {
+    backgroundColor: "#d3d3e6",
+    borderRadius: 15,
+    padding: 20,
+    marginVertical: 15,
+    width: width * 0.9,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+    borderLeftWidth: 8,
+    borderLeftColor: Color.appDefaultColor,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  packageName: {
+    fontSize: 22,
+    fontFamily: FontFamily.poppinsBold,
+    color: Color.colorDarkslategray,
+    marginLeft: 10,
+  },
+  servicesContainer: {
+    marginBottom: 20,
+  },
+  serviceItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  serviceText: {
+    fontSize: 16,
+    fontFamily: FontFamily.poppinsRegular,
+    color: "#333",
+  },
+  serviceFrequency: {
+    fontSize: 13,
+    color: Color.colorDarkslategray,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  price: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: Color.appDefaultColor,
+  },
+  subscribeButton: {
+    backgroundColor: Color.appDefaultColor,
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+    marginRight: 5,
   },
   item: {
     flexDirection: "row",
@@ -303,25 +404,59 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
     marginVertical: 10,
-    padding: 20,
-    justifyContent: "space-between",
+    paddingHorizontal: 20,
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
-    elevation: 5,
+    // elevation: 5,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  packageName: {
+    fontSize: 22,
+    fontFamily: FontFamily.poppinsBold,
+    color: Color.colorDarkslategray,
+    marginLeft: 10,
+  },
+  servicesContainer: {
+    marginBottom: 20,
+  },
+  serviceItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  serviceText: {
+    fontSize: 16,
+    fontFamily: FontFamily.poppinsRegular,
+    color: "#333",
+  },
+
+  
+  buttonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+    marginRight: 5,
   },
   content: {
     flex: 1,
-    justifyContent: "center",
+
+    alignItems: "center",
   },
   title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1F2937",
+    fontSize: 24,
+    fontWeight: "300",
+    color: Color.colorDarkslategray,
     marginBottom: 10,
     letterSpacing: 1.1,
-    textAlign: "left",
+    textAlign: "center",
   },
   description: {
     fontSize: 14,
@@ -339,10 +474,10 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   serviceName: {
-    fontSize: 12,
+    fontSize: 13,
     marginLeft: 10,
     color: "#333",
-    width:'90%'
+    width: "90%",
   },
   price: {
     fontSize: 16,
@@ -371,8 +506,9 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   keyValueTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 13,
+    fontFamily: FontFamily.poppinsBold,
+    fontWeight: "500",
   },
   testimonialContainer: {
     flexDirection: "row",

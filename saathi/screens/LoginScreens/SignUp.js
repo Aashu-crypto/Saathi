@@ -67,7 +67,7 @@ export default function SignUp({ navigation }) {
       email,
       contactNo: number,
       password,
-      packageID: value,
+      // packageID: value,
     };
     console.log("formData", formData);
 

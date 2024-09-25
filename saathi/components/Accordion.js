@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Collapsible from "react-native-collapsible";
 import { Ionicons } from "@expo/vector-icons";
-import { Color } from "../GlobalStyles";
+import { Color, FontFamily } from "../GlobalStyles";
 import img1 from "../assets/imgs/1.jpeg";
 import img2 from "../assets/imgs/2.jpeg";
 import img3 from "../assets/imgs/3.jpeg";
@@ -20,26 +20,27 @@ const Accordion = () => {
 
   const SECTIONS = [
     {
-      title: "Step 1: Register with us",
-      content: "Saathi is easy to set up so start using right away.",
+      title: "Step 1: Sign Up with Saathi",
+      content:
+        "Download the Saathi app and register using your phone number to get started.",
       img: img1,
     },
     {
-      title: "Step 2: We assign a Saathi to you",
+      title: "Step 2: Choose a  Package",
       content:
-        "Select a care package that best suits your family’s needs, whether it’s regular social calls, errands, or in-person check-ins.",
+        "Select a package that suits your family’s needs, from regular calls to home visits and running errands.",
       img: img2,
     },
     {
-      title: "Step 3: Saathi connects with patrons",
+      title: "Step 3: Saathi Begins Care",
       content:
-        "Your assigned Saathi companion will reach out to your family member and start providing the care and support they need. You’ll receive updates and reports directly to your phone.",
+        "Your assigned Saathi will connect with your loved ones, offering companionship and essential care, while you receive updates in the app.",
       img: img3,
     },
     {
-      title: "Step 4: Stay Informed",
+      title: "Step 4: Stay Connected",
       content:
-        "Track your Saathi’s visits, check-ins, and progress reports through the app, so you always know how your loved one is doing.",
+        "Track visits, calls, and other activities in real-time through the app, ensuring your loved one is well cared for.",
       img: img4,
     },
   ];
@@ -56,11 +57,20 @@ const Accordion = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text
         style={{
-          fontSize: 22,
-          fontWeight: "600",
-          textAlign: "left",
+          fontSize: 20,
+          fontWeight: "500",
+          textAlign: "center",
           marginVertical: 20,
-          color: "#1F2937",
+          color: Color.appDefaultColor,
+          fontFamily: FontFamily.poppinsRegular,
+      
+          textDecorationColor: Color.appDefaultColor,
+          backgroundColor: Color.lightOrange,
+          padding: 5,
+          borderRadius: 15,
+          borderWidth: 1,
+          borderColor: Color.appDefaultColor,
+          overflow: "hidden",
         }}
       >
         How We Work
@@ -79,7 +89,7 @@ const Accordion = () => {
                   : "chevron-down-outline"
               }
               size={24}
-              color="#4A90E2"
+              color={Color.appDefaultColor}
             />
           </TouchableOpacity>
           <Collapsible collapsed={!activeSections.includes(index)}>
@@ -95,7 +105,7 @@ const Accordion = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10,
+   
     backgroundColor: "#fff",
   },
   sectionContainer: {
@@ -117,9 +127,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   headerText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+
     color: Color.appDefaultColor,
+    fontFamily: FontFamily.poppinsRegular,
+    letterSpacing: 1,
   },
   content: {
     padding: 15,
@@ -128,8 +140,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
   },
   contentText: {
-    fontSize: 14,
-    color: "#666666",
+    fontSize: 12,
+    color: Color.colorGrayNormal,
     marginBottom: 10,
   },
   image: {
