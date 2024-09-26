@@ -93,7 +93,7 @@ const Testimonials = () => {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
+        // contentContainerStyle={styles.listContainer}
       />
     </View>
   );
@@ -103,13 +103,13 @@ export default Testimonials;
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
+marginTop:20
   },
   listContainer: {
     paddingHorizontal: 10,
   },
   testimonialItem: {
-    width: width * 0.95,
+    width: width ,
   },
   testimonialContainer: {
     flexDirection: "row",
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     elevation: 5,
-    width: "95%",
+    // width: "95%",
     marginHorizontal: 5,
   },
   avatar: {

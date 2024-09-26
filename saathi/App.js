@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Provider, useDispatch } from "react-redux";
 import { store } from "./Redux/Store";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import RootStack from "./navigation/RootStack";
 export default function App() {
   const [loaded, error] = useFonts({
@@ -16,9 +17,11 @@ export default function App() {
   }
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <RootStack />
-      </NavigationContainer>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <RootStack />
+        </NavigationContainer>
+      </GestureHandlerRootView>
     </Provider>
   );
 }

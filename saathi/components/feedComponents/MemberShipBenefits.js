@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
     backgroundColor: Color.lightOrange,
     padding: 5,
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: Color.appDefaultColor,
-    marginHorizontal:10
+    marginHorizontal: 10,
   },
   benefitsContainer: {
     flexDirection: "row",
@@ -95,13 +95,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   benefitTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "500",
+    fontFamily: FontFamily.poppinsBold,
     marginLeft: 5,
   },
   benefitText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "400",
-    color: "black",
+    color: Color.colorDarkslategray,
+    textAlign: "center",
   },
 });

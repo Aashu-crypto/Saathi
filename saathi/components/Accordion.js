@@ -54,15 +54,11 @@ const Accordion = () => {
           textAlign: "center",
           marginVertical: 20,
           color: Color.appDefaultColor,
-          fontFamily: FontFamily.poppinsRegular,
-
-          textDecorationColor: Color.appDefaultColor,
           backgroundColor: Color.lightOrange,
           padding: 5,
           borderRadius: 15,
-          borderWidth: 1,
+          borderWidth: 0.5,
           borderColor: Color.appDefaultColor,
-          overflow: "hidden",
           marginHorizontal: 10,
         }}
       >
@@ -109,6 +105,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+    marginHorizontal:5
   },
   header: {
     flexDirection: "row",
@@ -124,6 +121,7 @@ const styles = StyleSheet.create({
     color: Color.appDefaultColor,
     fontFamily: FontFamily.poppinsRegular,
     letterSpacing: 1,
+    fontWeight:'500'
   },
   content: {
     padding: 15,
@@ -132,8 +130,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
   },
   contentText: {
-    fontSize: 12,
-    color: Color.colorGrayNormal,
+    fontSize: 13,
+    color: Color.colorDarkslategray,
     marginBottom: 10,
   },
   image: {

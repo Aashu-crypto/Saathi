@@ -25,14 +25,14 @@ const AllCuresBlog = () => {
           headers: headers,
         }
       );
-      console.log("resp", response);
+      
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
       const json = await response.json();
-      console.log("article data", json);
+     
 
       // Using map directly to create the array
       setArticleId(json[0].article_id);
