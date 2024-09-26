@@ -16,32 +16,47 @@ import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
 import Divider from "../../components/Divider";
 import { profileData } from "../../Redux/Slice/ProfileDataSlice";
+
 const Account = ({ navigation }) => {
   const profileOptionsData = [
-    { title: "About us", route: Route.ABOUTUS },
-
-    { title: "Your Saathi", route: Route.YOURSAATHI },
-    { title: "Your Packages", route: Route.YOURPACKAGES },
+    { title: "About us", route: Route.ABOUTUS, content: "More about us here." },
+    { title: "Your Saathi", route: Route.YOURSAATHI, content: "Details about Your Saathi." },
+    { title: "Your Packages", route: Route.YOURPACKAGES, content: "Packages you have chosen." },
   ];
+
   const [mail, setMail] = useState();
+  const [openAccordions, setOpenAccordions] = useState(
+    new Array(profileOptionsData.length).fill(false)
+  ); // To keep track of which accordion is open
+
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile.data || {});
-  console.log(profile);
+
+  useEffect(() => {
+    if (Object.keys(profile).length === 0) {
+      dispatch(screen(Route.LOGIN));
+    }
+  }, []);
 
   useEffect(() => {
     const fetch = async () => {
       const mail = await AsyncStorage.getItem("Email");
-      console.log("My Mail", mail);
       setMail(mail);
     };
     fetch();
   }, []);
 
+  const toggleAccordion = (index) => {
+    setOpenAccordions((prevState) => {
+      const newState = [...prevState];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-
-      <ScrollView style={{ marginHorizontal: 10, flex: 1 ,marginTop:20}}>
-        {/* Commented out section; not relevant to map function focus */}
+      <ScrollView style={{ marginHorizontal: 10, flex: 1, marginTop: 20 }}>
         <View
           style={{
             justifyContent: "center",
@@ -57,35 +72,16 @@ const Account = ({ navigation }) => {
               <Text style={styles.profileName}>
                 {profile.firstName} {profile.lastName}
               </Text>
-
               <Text style={styles.infoText}>{profile.email}</Text>
             </View>
           ) : (
             <Pressable
-              style={{
-                backgroundColor: Color.lightpurple,
-                borderRadius: 15,
-                borderColor: Color.appDefaultColor,
-                color: Color.colorDarkslategray,
-                borderWidth: 1,
-                padding: 15,
-              }}
+              style={styles.signInButton}
               onPress={() => {
                 dispatch(screen(Route.LOGIN));
               }}
             >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "400",
-                  width: width / 1.8,
-                  textAlign: "center",
-                  fontFamily: FontFamily.poppinsRegular,
-                  textDecorationLine: "underline",
-                }}
-              >
-                Sign In/Sign Up
-              </Text>
+              <Text style={styles.signInText}>Sign In/Sign Up</Text>
             </Pressable>
           )}
         </View>
@@ -93,14 +89,17 @@ const Account = ({ navigation }) => {
         {profileOptionsData.map((item, index) => (
           <View key={item.title}>
             <TouchableOpacity
-              onPress={() => {
-                item.route && navigation.navigate(item.route);
-              }}
+              onPress={() => toggleAccordion(index)} // Toggle the accordion when clicked
             >
               <View style={styles.titleView}>
                 <Text style={styles.titleText}>{item.title}</Text>
               </View>
             </TouchableOpacity>
+            {openAccordions[index] && (
+              <View style={styles.accordionContent}>
+                <Text>{item.content}</Text>
+              </View>
+            )}
             <View style={{ borderWidth: 0.5 }} />
           </View>
         ))}
@@ -120,6 +119,7 @@ const Account = ({ navigation }) => {
 };
 
 export default Account;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   setting: {
     fontSize: 25,
     color: Color.colorDarkslategray,
-    // lineHeight:17,
     fontWeight: "600",
     margin: 10,
   },
@@ -146,16 +145,11 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.poppinsRegular,
     color: Color.colorDarkslategray,
   },
-  feedHeader: {
-    height: 90,
-    width: width,
-    backgroundColor: "#fff",
-    paddingHorizontal: 20,
-  },
-  read: {
-    color: Color.colorDarkslategray,
-    fontWeight: "700",
-    fontSize: 25,
+  accordionContent: {
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    marginHorizontal: 10,
+    borderRadius: 5,
   },
   logout: {
     backgroundColor: Color.appDefaultColor,
@@ -177,7 +171,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.poppinsRegular,
     fontSize: 25,
     marginLeft: 14,
-
     fontWeight: "500",
     letterSpacing: 1,
     width: "auto",
@@ -188,5 +181,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 5,
     marginLeft: 15,
+  },
+  signInButton: {
+    backgroundColor: Color.lightpurple,
+    borderRadius: 15,
+    borderColor: Color.appDefaultColor,
+    color: Color.colorDarkslategray,
+    borderWidth: 1,
+    padding: 15,
+  },
+  signInText: {
+    fontSize: 16,
+    fontWeight: "400",
+    width: width / 1.8,
+    textAlign: "center",
+    fontFamily: FontFamily.poppinsRegular,
+    textDecorationLine: "underline",
   },
 });

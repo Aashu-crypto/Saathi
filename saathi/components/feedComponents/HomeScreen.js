@@ -80,7 +80,7 @@ const HomeScreen = () => {
             <Text style={styles.serviceText}>
               {service.serviceName}{" "}
               <Text style={styles.serviceFrequency}>
-                ({service.frequency} times per {service.frequencyUnit})
+                ({service.frequency} times per month)
               </Text>
             </Text>
           </View>
@@ -107,9 +107,9 @@ const HomeScreen = () => {
         Saathi provides a wide range of services to make life easier for your
         loved ones and give you peace of mind.
       </Text>
-
-      <Accordion />
       <MemberShipBenefits />
+      <Accordion />
+     
 
       <Text style={styles.sectionTitle}>Explore our Packages</Text>
 
@@ -161,7 +161,7 @@ const HomeScreen = () => {
         )}
       </View>
 
-      <Text style={styles.sectionTitle}>Read our Blogs</Text>
+      <Text style={styles.sectionTitle}>Cures from around the world</Text>
       <AllCuresBlog />
       <Testimonials />
     </ScrollView>
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray,
     borderRadius: 10,
     padding: 5,
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 15,
     marginVertical: 10,
   },
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: Color.appDefaultColor,
+    marginHorizontal:10
   },
   flatListContainer: {
     position: "relative", // Required to position arrows absolutely

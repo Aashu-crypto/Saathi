@@ -8,6 +8,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Route } from "../../routes";
 import { Color } from "../../GlobalStyles";
 import SignUp from "../../screens/LoginScreens/SignUp";
+import OTPScreen from "../../screens/LoginScreens/OTPScreen";
+import PasswordScreen from "../../screens/LoginScreens/ConfirmPassword";
 
 const LoginStack = () => {
   const Stack = createStackNavigator();
@@ -59,6 +61,35 @@ const LoginStack = () => {
       <Stack.Screen
         name={Route.LOGIN}
         component={LoginScreen}
+        options={{
+          headerShown: true,
+          headerTitleAlign: "center",
+          headerTitle: "Saathi",
+          headerTitleStyle: {
+            fontFamily: "Dream-Orphans-bd",
+            color: Color.appDefaultColor,
+            letterSpacing: 2,
+            fontSize: 25,
+          },
+        }}
+      />
+      <Stack.Screen
+        name={Route.OTPSCREEN}
+        component={OTPScreen}
+        options={{
+          headerShown: true,
+          headerTitleAlign: "center",
+          headerTitle: "",
+          headerTitleStyle: {
+            color: Color.appDefaultColor,
+
+            fontSize: 25,
+          },
+        }}
+      />
+      <Stack.Screen
+        name={Route.CONFIRMPASSWORD}
+        component={PasswordScreen}
         options={{
           headerShown: true,
           headerTitleAlign: "center",

@@ -10,10 +10,6 @@ import {
 import Collapsible from "react-native-collapsible";
 import { Ionicons } from "@expo/vector-icons";
 import { Color, FontFamily } from "../GlobalStyles";
-import img1 from "../assets/imgs/1.jpeg";
-import img2 from "../assets/imgs/2.jpeg";
-import img3 from "../assets/imgs/3.jpeg";
-import img4 from "../assets/imgs/4.jpeg";
 
 const Accordion = () => {
   const [activeSections, setActiveSections] = useState([0]);
@@ -23,25 +19,21 @@ const Accordion = () => {
       title: "Step 1: Sign Up with Saathi",
       content:
         "Download the Saathi app and register using your phone number to get started.",
-      img: img1,
     },
     {
       title: "Step 2: Choose a  Package",
       content:
         "Select a package that suits your family’s needs, from regular calls to home visits and running errands.",
-      img: img2,
     },
     {
       title: "Step 3: Saathi Begins Care",
       content:
         "Your assigned Saathi will connect with your loved ones, offering companionship and essential care, while you receive updates in the app.",
-      img: img3,
     },
     {
       title: "Step 4: Stay Connected",
       content:
         "Track visits, calls, and other activities in real-time through the app, ensuring your loved one is well cared for.",
-      img: img4,
     },
   ];
 
@@ -63,7 +55,7 @@ const Accordion = () => {
           marginVertical: 20,
           color: Color.appDefaultColor,
           fontFamily: FontFamily.poppinsRegular,
-      
+
           textDecorationColor: Color.appDefaultColor,
           backgroundColor: Color.lightOrange,
           padding: 5,
@@ -71,6 +63,7 @@ const Accordion = () => {
           borderWidth: 1,
           borderColor: Color.appDefaultColor,
           overflow: "hidden",
+          marginHorizontal: 10,
         }}
       >
         How We Work
@@ -105,7 +98,6 @@ const Accordion = () => {
 
 const styles = StyleSheet.create({
   container: {
-   
     backgroundColor: "#fff",
   },
   sectionContainer: {

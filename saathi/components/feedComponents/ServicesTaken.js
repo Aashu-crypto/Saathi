@@ -49,11 +49,11 @@ const ServicesTaken = () => {
           <Text style={styles.description}>{item.description}</Text>
         </View>
         {/* Image Placeholder */}
-        <Image
+        {/* <Image
           source={require('../../assets/imgs/1.jpeg')} // Add image URL here
           style={styles.cardImage}
           resizeMode="cover"
-        />
+        /> */}
       </View>
     );
   };

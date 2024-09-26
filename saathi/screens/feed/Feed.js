@@ -28,7 +28,6 @@ const Feed = () => {
   const flatListRef = useRef(null);
   const currentIndex = useRef(0);
 
-
   const testimonials = [
     {
       id: "4",
@@ -98,29 +97,18 @@ const Feed = () => {
     return () => clearInterval(interval); // Clear the interval on unmount
   }, []);
 
-  const TestimonialItem = ({ item }) => (
-    <View style={{ flex: 1, width: width * 0.95 }}>
-      <View style={styles.testimonialContainer}>
-        <Image source={{ uri: item.avatar }} style={styles.avatar} />
-        <View style={styles.textContainer}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.feedback}>"{item.feedback}"</Text>
-          <View style={styles.ratingContainer}>
-            {Array.from({ length: item.rating }).map((_, index) => (
-              <Icon key={index} name="star" size={20} color="#FFD700" />
-            ))}
-          </View>
-        </View>
-      </View>
-    </View>
-  );
   return (
     <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
       <StatusBar style="dark" />
 
       {/* <ServiceSelector/> */}
-      {Object.keys(profile).length !== 0 && <ServicesTaken />}
-      {Object.keys(profile).length === 0 && <HomeScreen />}
+
+      {Object.keys(profile).length !== 0 &&
+        (profile.billingStatus === 0 ? <HomeScreen /> : <ServicesTaken />)}
+
+      {Object.keys(profile).length === 0 && profile?.billingStatus === 0 && (
+        <HomeScreen />
+      )}
 
       {/* {Object.keys(profile).length !== 0 && <ServiceSelector />} */}
       {/* <View style={styles.exploreButtons}>
@@ -147,6 +135,4 @@ const Feed = () => {
 };
 
 export default Feed;
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

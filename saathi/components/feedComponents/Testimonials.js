@@ -161,5 +161,6 @@ const styles = StyleSheet.create({
     borderColor: Color.appDefaultColor,
     paddingHorizontal: 20,
     marginBottom: 10,
+    marginHorizontal:10
   },
 });

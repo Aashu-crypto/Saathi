@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: Color.appDefaultColor,
+    marginHorizontal:10
   },
   benefitsContainer: {
     flexDirection: "row",

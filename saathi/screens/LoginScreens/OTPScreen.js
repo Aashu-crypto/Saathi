@@ -1,103 +1,130 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
+  Alert,
   StyleSheet,
-  SafeAreaView,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-  Dimensions,
+  ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-
-import Icon from "react-native-vector-icons/Feather";
+import OTPInputView from "@twotalltotems/react-native-otp-input"; // OTP Input Library
+import { useNavigation } from "@react-navigation/native"; // For Navigation
 import { Color, FontFamily } from "../../GlobalStyles";
-import { StackActions } from "@react-navigation/native";
-import { Route } from "../../routes/router";
-import { CommonActions } from "@react-navigation/native";
-import FeedStack from "../../navigation/stack/FeedStack";
-const { width, height } = Dimensions.get("window");
+import OTP from "../../assets/imgs/OtpScreen.svg";
+import { Route } from "../../routes";
+import { BACKEND_HOST } from "../../config";
 
-export default function OTPVerificationScreen({ navigation }) {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const inputRefs = useRef([]);
+export default function OtpScreen({ route }) {
+  const [loader, setLoader] = useState(false);
+  const [error, setError] = useState(null);
+  const email = route.params?.email;
+  const navigation = useNavigation(); // Navigation hook
 
-  const handleOtpChange = (value, index) => {
-    if (/^[0-9]$/.test(value)) {
-      const newOtp = [...otp];
-      newOtp[index] = value;
-      setOtp(newOtp);
+  // Function to handle OTP verification
+  const handleVerifyOtp = async (otp) => {
+    navigation.navigate(Route.CONFIRMPASSWORD, {
+      email: email,
+    });
+    if (otp && otp.length === 6) {
+      setLoader(true);
+      setError(null); // Clear previous error
 
-      if (index < 5) {
-        inputRefs.current[index + 1].focus();
+      try {
+        const response = await fetch(
+          `${BACKEND_HOST}/subscribers/verify?email=${email}&otp=${otp}`,
+          { method: "POST" }
+        );
+        console.log("response", response);
+
+        const result = await response.json();
+
+        // Handling different response statuses
+        if (response.ok && result === 1) {
+          setLoader(false);
+          // Alert.alert("Success", "OTP verified successfully.");
+          navigation.navigate(Route.CONFIRMPASSWORD, {
+            email: email,
+          });
+        } else {
+          setLoader(false);
+          setError("Invalid OTP. Please try again.");
+          Alert.alert("Error", "The OTP you entered is incorrect.");
+        }
+      } catch (error) {
+        setLoader(false);
+        setError("Failed to verify OTP. Please try again later.");
+        Alert.alert(
+          "Network Error",
+          "Something went wrong. Please check your internet connection and try again."
+        );
+        console.error("OTP verification error: ", error);
       }
+    } else {
+      Alert.alert("Invalid OTP", "Please enter a 6-digit OTP.");
     }
   };
 
-  const handleVerifyOtp = () => {
-    if (otp.join("").length === 6) {
-      // Reset the navigation stack to the BottomTab screen
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: Route.BOTTOM_TAB }],
-        })
-      );
-    } else {
-      Alert.alert("Invalid OTP", "Please enter a valid 6-digit OTP.");
-    }
+  // Function to handle OTP resend
+  const handleResendOtp = () => {
+    setLoader(true);
+    // Simulate OTP resend logic here (API call)
+    setTimeout(() => {
+      setLoader(false);
+      Alert.alert("OTP Resent", "A new OTP has been sent to your email.");
+    }, 2000); // Simulating network delay for OTP resend
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.innerContainer}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
         >
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Icon name="arrow-left" size={24} color="#000" />
-          </TouchableOpacity>
+          <View style={styles.innerContainer}>
+            {/* SVG Illustration */}
+            <OTP height={200} width={200} />
 
-          <View style={styles.elevatedContainer}>
-            <Text style={styles.title}>Enter OTP</Text>
+            {/* Title */}
+            <Text style={styles.title}>Verify Your Email</Text>
             <Text style={styles.subtitle}>
-              Sent to <Text style={{ color: "#4A4A4A" }}>+91-6578888888</Text>
+              We have sent a 6-digit OTP to {email}.
             </Text>
-            <View style={styles.otpContainer}>
-              {otp.map((digit, index) => (
-                <TextInput
-                  key={index}
-                  style={styles.otpInput}
-                  keyboardType="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChangeText={(value) => handleOtpChange(value, index)}
-                  ref={(ref) => (inputRefs.current[index] = ref)}
-                />
-              ))}
-            </View>
-            <TouchableOpacity
-              style={styles.verifyButton}
-              onPress={handleVerifyOtp}
-            >
-              <Text style={styles.verifyButtonText}>Verify OTP</Text>
-            </TouchableOpacity>
-            <Text style={styles.resendText}>
-              Didn’t receive OTP yet?{" "}
-              <Text style={styles.resendLink}>Resend OTP</Text>
+
+            {/* OTP Input */}
+            <OTPInputView
+              style={styles.otpContainer}
+              pinCount={6}
+              autoFocusOnLoad
+              codeInputFieldStyle={styles.otpInput}
+              codeInputHighlightStyle={styles.otpHighlight}
+              onCodeFilled={handleVerifyOtp}
+            />
+
+            {/* Error message */}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+
+            {/* Loader */}
+            {loader && (
+              <ActivityIndicator size="large" color={Color.appDefaultColor} />
+            )}
+
+            {/* Resend OTP */}
+            <Text style={styles.resendText}>Didn’t receive the OTP?</Text>
+            <Text style={styles.resendButton} onPress={handleResendOtp}>
+              Resend OTP
             </Text>
           </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -108,86 +135,62 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-  },
-  backButton: {
-    position: "absolute",
-    top: height * 0.05,
-    left: width * 0.05,
-  },
-  image: {
-    width: width * 0.5,
-    height: height * 0.25,
-    marginBottom: height * 0.05,
-    resizeMode: "contain",
-  },
-  elevatedContainer: {
-    width: "100%",
-    padding: 20,
-    backgroundColor: Color.lightOrange,
-    borderRadius: 10,
-    elevation: 5, // For Android
-    shadowColor: "#000", // For iOS
-    shadowOffset: { width: 0, height: 2 }, // For iOS
-    shadowOpacity: 0.25, // For iOS
-    shadowRadius: 3.84, // For iOS
   },
   title: {
-    fontSize: 14,
-    fontWeight: "500",
-    textAlign: "left",
+    fontSize: 24,
+    fontWeight: "600",
+    color: Color.appDefaultColor,
+    textAlign: "center",
     marginBottom: 10,
-    lineHeight: 21,
     fontFamily: FontFamily.poppinsRegular,
-    color: "#4A4A4A",
   },
   subtitle: {
-    fontSize: 14,
-    textAlign: "left",
-    marginBottom: 20,
-    fontWeight: "400",
-    lineHeight: 21,
-    fontFamily: FontFamily.poppinsRegular,
-    color: "#998383",
+    fontSize: 16,
+    color: Color.colorGrayLight,
+    textAlign: "center",
+    marginBottom: 30,
   },
   otpContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    width: "90%",
+    height: 100,
     marginBottom: 20,
   },
   otpInput: {
-    width: width * 0.12,
-    height: height * 0.06,
-    borderColor: "#000",
-    borderBottomWidth: 1,
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: Color.lightOrange,
+    color: "#333",
+    fontSize: 20,
+    borderWidth: 1,
+    borderColor: Color.appDefaultColor,
     textAlign: "center",
-    fontSize: 18,
-    borderRadius: 10,
+    margin: 2,
   },
-  verifyButton: {
-    backgroundColor: Color.appDefaultColor,
-    padding: height * 0.02,
-    borderRadius: 5,
-    alignItems: "center",
-    marginBottom: 20,
+  otpHighlight: {
+    borderColor: Color.appDefaultColor,
   },
-  verifyButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: FontFamily.poppinsRegular,
-    fontWeight: "400",
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginVertical: 10,
+    textAlign: "center",
   },
   resendText: {
-    textAlign: "left",
+    fontSize: 14,
     color: "#888",
-    fontSize: 10,
-    fontWeight: "400",
-    fontFamily: FontFamily.poppinsRegular,
+    textAlign: "center",
+    marginTop: 20,
   },
-  resendLink: {
-    color: "#1C4BF4",
+  resendButton: {
+    fontSize: 16,
+    color: Color.appDefaultColor,
+    fontWeight: "500",
+    textAlign: "center",
+    marginTop: 10,
+    textDecorationLine: "underline",
   },
 });

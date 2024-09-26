@@ -35,17 +35,18 @@ export default function SignUp({ navigation }) {
   const [otp, setOtp] = useState(""); // OTP state
   const [otpVerified, setOtpVerified] = useState(false); // OTP verification state
   const [loader, setLoader] = useState(false); // loader for Sign Up
-
+  const [countryCode, setCountryCode] = useState("");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
 
   const handleSubmit = async () => {
-    if (!firstName || !lastName || !email || !password || !otpVerified) {
+    console.log();
+
+    if (!firstName || !lastName || !email) {
       Alert.alert(
         "Please fill all the fields and verify OTP before submitting"
       );
@@ -57,13 +58,14 @@ export default function SignUp({ navigation }) {
       firstName,
       lastName,
       email,
-      contactNo: formattedValue, // Use formatted number
-      password,
+      contactNo: number, // Use formatted number
+      countryCode,
     };
+    console.log(formData);
 
     try {
       const response = await fetch(
-        `https://saathi.etheriumtech.com:444/Saathi/subscribers`,
+        `https://saathi.etheriumtech.com:444/Saathi/subscribers/register`,
         {
           method: "POST",
           headers: {
@@ -76,12 +78,11 @@ export default function SignUp({ navigation }) {
       const json = await response.json();
       if (response.ok) {
         dispatch(profileData(json));
-        dispatch(screen(Route.MAIN));
+        navigation.navigate(Route.OTPSCREEN, {
+          email: email,
+        });
         setLoader(false);
-        Alert.alert(
-          "Your request has been Submitted!",
-          "We will get back to you shortly"
-        );
+    
       } else {
         setLoader(false);
         Alert.alert("Error", json.message || "Please fill all the fields");
@@ -135,21 +136,21 @@ export default function SignUp({ navigation }) {
               <View style={styles.form}>
                 <Text style={styles.formTitle}>Create Account</Text>
                 <TextInput
-                  style={[styles.input, { borderBottomWidth: 1 }]}
+                  style={styles.input}
                   placeholder="First Name"
                   onChangeText={setFirstName}
                   value={firstName}
                   placeholderTextColor="gray"
                 />
                 <TextInput
-                  style={[styles.input, { borderBottomWidth: 1 }]}
+                  style={styles.input}
                   placeholder="Last Name"
                   onChangeText={setLastName}
                   value={lastName}
                   placeholderTextColor="gray"
                 />
                 <TextInput
-                  style={[styles.input, { borderBottomWidth: 1 }]}
+                  style={styles.input}
                   placeholder="Email"
                   keyboardType="email-address"
                   onChangeText={setEmail}
@@ -158,81 +159,40 @@ export default function SignUp({ navigation }) {
                 />
 
                 {/* Phone Number Input with Country Code */}
-                <PhoneInput
-                  ref={phoneInput}
-                  defaultValue={number}
-                  defaultCode="US"
-                  layout="first"
-                  onChangeText={(text) => {
-                    setNumber(text);
-                  }}
-                  onChangeFormattedText={(text) => {
-                    setFormattedValue(text); // Get the formatted phone number with country code
-                  }}
-                  withDarkTheme
-                  withShadow
-                  autoFocus
-                />
-
-                {formattedValue && !otpSent && (
-                  <TouchableOpacity
-                    style={styles.login}
-                    onPress={handlePhoneNumberSubmit}
-                  >
-                    <Text style={styles.loginText}>Send OTP</Text>
-                  </TouchableOpacity>
-                )}
-
-                {otpSent && (
-                  <View>
-                    <TextInput
-                      style={[styles.input, { borderBottomWidth: 1 }]}
-                      placeholder="Enter OTP"
-                      keyboardType="number-pad"
-                      onChangeText={setOtp}
-                      value={otp}
-                      placeholderTextColor="gray"
-                      maxLength={4} // Assuming a 4-digit OTP
-                    />
-                    <TouchableOpacity
-                      style={styles.verifyOtpButton} // Updated Button Style
-                      onPress={handleVerifyOtp}
-                    >
-                      <Text style={styles.verifyOtpText}>Verify OTP</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                <View style={[styles.passwordContainer]}>
-                  <TextInput
-                    style={[styles.input, { width: 180 }]}
-                    placeholder="Password"
-                    secureTextEntry={!showPassword}
-                    onChangeText={setPassword}
-                    value={password}
-                    placeholderTextColor="gray"
+                <View style={styles.phoneInputContainer}>
+                  <PhoneInput
+                    ref={phoneInput}
+                    defaultValue={number}
+                    defaultCode="US"
+                    layout="first"
+                    onChangeText={(text) => {
+                      setNumber(text);
+                    }}
+                    onChangeFormattedText={(text) => {
+                      setFormattedValue(text); // Get the formatted phone number with country code
+                    }}
+                    onChangeCountry={(country) => {
+                      setCountryCode(country.callingCode[0]); // Set the country code
+                    }}
+                    withDarkTheme
+                    withShadow
+                    autoFocus
+                    containerStyle={styles.phoneInput}
+                    textContainerStyle={styles.phoneInputText}
                   />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                  >
-                    <Ionicons
-                      name={!showPassword ? "eye-off-outline" : "eye-outline"}
-                      size={20}
-                      color="gray"
-                    />
-                  </TouchableOpacity>
                 </View>
+
                 <TouchableOpacity
                   style={styles.login}
                   onPress={handleSubmit}
-                  disabled={!otpVerified} // Disable if OTP is not verified
+                  // Disable if OTP is not verified
                 >
                   {loader ? (
                     <Text style={styles.loginText}>
                       Please wait... <ActivityIndicator />
                     </Text>
                   ) : (
-                    <Text style={styles.loginText}>Sign Up</Text>
+                    <Text style={styles.loginText}>Next</Text>
                   )}
                 </TouchableOpacity>
                 <Pressable
@@ -245,6 +205,18 @@ export default function SignUp({ navigation }) {
                 </Pressable>
               </View>
             </View>
+            <Pressable
+              onPress={() => {
+                dispatch(screen(Route.MAIN));
+              }}
+            >
+              <Ionicons
+                name={"close-circle-outline"}
+                size={35}
+                color={Color.appDefaultColor}
+              />
+              <Text style={{ fontSize: 6, alignSelf: "center" }}>close</Text>
+            </Pressable>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -268,10 +240,11 @@ const styles = StyleSheet.create({
     height: height * 0.2,
   },
   title: {
-    fontSize: 13,
+    fontSize: 16,
     textAlign: "center",
     width: "80%",
     color: "#555",
+    marginBottom: 20,
   },
   inputContainer: {
     width: "100%",
@@ -279,28 +252,49 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   form: {
-    width: "80%",
+    width: "85%",
     marginBottom: 50,
   },
   formTitle: {
     alignSelf: "center",
-    fontSize: 25,
+    fontSize: 24,
     color: "#333",
     marginBottom: 25,
   },
   input: {
-    height: 40,
+    height: 50,
     padding: 10,
-    borderRadius: 5,
-    backgroundColor: "#f0f0f0",
-    marginBottom: 15,
-    borderColor: "#999",
+    borderRadius: 10,
+    backgroundColor: Color.lightOrange,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: Color.appDefaultColor,
+    fontSize: 16,
+    color: Color.colorGray,
+  },
+  phoneInputContainer: {
+    marginBottom: 20,
+    borderRadius: 10,
+    overflow: "hidden", // Ensure the rounded corners are applied to the entire PhoneInput
+  },
+  phoneInput: {
+    width: "100%",
+    backgroundColor: Color.lightOrange,
+    height: 60,
+    borderRadius: 10,
+    borderColor: Color.appDefaultColor,
+    borderWidth: 1,
+  },
+  phoneInputText: {
+    backgroundColor: Color.lightOrange,
+    borderRadius: 10,
   },
   login: {
     backgroundColor: Color.appDefaultColor,
-    height: 48,
-    borderRadius: 8,
+    height: 50,
+    borderRadius: 10,
     justifyContent: "center",
+    marginBottom: 20,
   },
   loginText: {
     fontSize: 18,
@@ -308,40 +302,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
   },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 40,
-    borderRadius: 5,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderColor: "#999",
-    marginVertical: 10,
-  },
   footerText: {
     color: "#333",
-    fontFamily: "Poppins-Regular",
-  },
-  verifyOtpButton: {
-    backgroundColor: "#007bff", // Blue color for better visibility
-    height: 48,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 15,
-    shadowColor: "#000", // Shadow for the button
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5, // For Android shadow
-  },
-  verifyOtpText: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "600",
+    fontSize: 14,
   },
 });
