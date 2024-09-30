@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { FontFamily, Color } from "../../GlobalStyles";
+import { Divider } from "react-native-paper";
+import { BACKEND_HOST } from "../../config";
 
 /* screen dimension */
 const { width, height } = Dimensions.get("window");
@@ -17,12 +19,29 @@ const ServicesTaken = () => {
   const [request, setRequest] = useState([]);
   const profile = useSelector((state) => state.profile.data);
   const [loading, setLoading] = useState(false);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "long" });
+    const year = date.getFullYear();
 
+    // Add "th", "st", "nd", "rd" suffix to the day
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+        ? "rd"
+        : "th";
+
+    return `${day}${suffix} ${month} ${year}`;
+  };
   useEffect(() => {
     const fetchRequests = async () => {
       if (profile.subscriberID !== 0) {
         const response = await fetch(
-          `https://saathi.etheriumtech.com:444/Saathi/subscribers/7/services`
+          `${BACKEND_HOST}/subscribers/${profile.subscriberID}/services`
         );
         const json = await response.json();
         const flattenedData = json.reduce((acc, service) => {
@@ -40,20 +59,26 @@ const ServicesTaken = () => {
 
   const renderComponent = ({ item }) => {
     return (
-      <View style={styles.cardContainer}>
-        <View style={styles.cardContent}>
-          <View style={styles.header}>
-            <Text style={styles.serviceName}>{item.serviceName}</Text>
-            <Text style={styles.date}>{item.createdDate}</Text>
+      <View>
+        <View style={styles.cardContainer}>
+          <View style={styles.cardContent}>
+            <View style={styles.header}>
+              <Text style={styles.date}>{formatDate(item.createdDate)}</Text>
+            </View>
           </View>
-          <Text style={styles.description}>{item.description}</Text>
+          {/* Image Placeholder */}
+          {item.documents && (
+            <Image
+              source={{ uri: item.documents }} // Add image URL here
+              style={styles.cardImage}
+              resizeMode="stretch"
+            />
+          )}
+          <View style={{ padding: 10 }}>
+            <Text style={styles.description}>{item.description}</Text>
+          </View>
         </View>
-        {/* Image Placeholder */}
-        {/* <Image
-          source={require('../../assets/imgs/1.jpeg')} // Add image URL here
-          style={styles.cardImage}
-          resizeMode="cover"
-        /> */}
+        <Divider />
       </View>
     );
   };
@@ -78,7 +103,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 20,
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 26,
@@ -93,15 +118,18 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   cardContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: Color.lightOrange,
     borderRadius: 15,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+
+    shadowColor: "#ccc",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
     elevation: 4,
     marginBottom: 15,
+    overflow: "hidden",
+    borderLeftWidth: 4,
+    borderColor: Color.appDefaultColor,
   },
   cardImage: {
     width: "100%",
@@ -135,4 +163,3 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.poppinsRegular, // Custom font
   },
 });
-

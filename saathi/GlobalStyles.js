@@ -23,4 +23,6 @@ export const Color = {
   colorGrayLight: "#C4C4C4",
   colorGrayNormal: "#4C4E64",
   lightOrange: "#F7F5FE",
+  Moccasin:"#FFD580",
+  lavender:"#F0EFFF"
 };

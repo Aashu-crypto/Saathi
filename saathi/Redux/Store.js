@@ -1,7 +1,6 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import indexSlice from "./Slice/indexSlice";
 import screenSlice from "./Slice/screenNameSlice";
-import docSlice from "./Slice/DoctorDetailSlice";
 import profileSlice from "./Slice/ProfileDataSlice";
 import BookingSlice from "./Slice/BookingSlice";
 import {
@@ -20,11 +19,12 @@ import heightSlice from "./Slice/heightSlice";
 import articleIdSlice from "./Slice/ArticleIdSlice";
 import { tokenSlice } from "./Slice/TokenSlice";
 import packageSlice from "./Slice/packageSlice";
+import userPackageSlice from "./Slice/UserPackageSlice";
 const rootReducer = combineReducers({
   screen: screenSlice,
   height: heightSlice,
   index: indexSlice,
-  doc: docSlice,
+  userPackage: userPackageSlice,
   subscriptionPackages: packageSlice,
   profile: profileSlice,
   articleId: articleIdSlice,

@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   TouchableOpacity,
   Modal,
   SafeAreaView,
@@ -11,18 +10,19 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch, useSelector } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Route } from "../../routes";
 import { BACKEND_HOST } from "../../config";
-import { Color, FontFamily } from "../../GlobalStyles";
+import { Color } from "../../GlobalStyles";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
 const ServiceSelector = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,71 +30,162 @@ const ServiceSelector = () => {
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [services, setServices] = useState([]);
+  const [packageServices, setPackageServices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(true);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile.data || {});
-  const id = profile.subscriberID;
-  console.log("profile", profile);
 
+  const id = profile.subscriberID;
+
+  // Handle date change for the booking
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowPicker(false);
     setDate(currentDate);
   };
+
   const handleConfirm = async () => {
-    if (!selectedService) return;
+    // Basic validation
+    if (!selectedService) {
+      Alert.alert("Error", "Please select a service.");
+      return;
+    }
+
+    if (!profile || !profile.subscriberID) {
+      Alert.alert("Error", "Invalid subscriber information.");
+      return;
+    }
+
+    if (!date) {
+      Alert.alert("Error", "Please select a valid date and time.");
+      return;
+    }
+
+  
 
     const bookingDetails = {
       serviceID: selectedService.serviceID,
-      serviceDate: date.toISOString().split("T")[0],
-      serviceTime: date.toTimeString().split(" ")[0],
+      serviceDate: date.toISOString().split("T")[0], // Extract date in YYYY-MM-DD format
+      serviceTime: date.toTimeString().split(" ")[0], // Extract time in HH:MM:SS format
       billingStatus: 1,
       subscriberID: profile.subscriberID,
     };
-    console.log("booking Details", bookingDetails);
+    console.log(bookingDetails);
 
     try {
-      setLoading(true);
-      const response = await fetch(`${BACKEND_HOST}/subscriber-services`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingDetails),
-      });
-console.log("response booking",response);
+      setLoading(true); // Show loading indicator
 
-      if (!response.ok)
-        throw new Error("Failed to book the service. Please try again.");
+      let response;
+      if (packageService == 1) {
+        console.log("ispackageService", packageService);
 
+        response = await sendPutRequest(bookingDetails);
+      } else {
+        response = await sendPostRequest(bookingDetails);
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          errorText || "Failed to book the service. Please try again."
+        );
+      }
+
+      // Booking was successful
       Alert.alert(
-        "Success",
-        "Thank you for choosing us! We will get back to you soon."
+        "Booking Confirmed",
+        "Your booking has been successfully confirmed."
       );
       setConfirmBookingVisible(false);
       setModalVisible(false);
     } catch (error) {
+      // Error handling for failed API call or validation
+      console.log(error);
+
       Alert.alert("Error", error.message || "Something went wrong.");
     } finally {
-      setLoading(false);
+      setLoading(false); // Hide loading indicator
     }
   };
+
+  // Separate function for PUT request
+  const sendPutRequest = async (bookingDetails) => {
+    console.log("send put", bookingDetails);
+
+    return await fetch(`${BACKEND_HOST}/subscribers/service/updateRequest`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        requestedDate: bookingDetails.serviceDate,
+        requestedTime: bookingDetails.serviceTime,
+        subscriberID: bookingDetails.subscriberID,
+        serviceID: bookingDetails.serviceID,
+      }),
+    });
+  };
+
+  // Separate function for POST request
+  const sendPostRequest = async (bookingDetails) => {
+    console.log("post request");
+
+    return await fetch(`${BACKEND_HOST}/subscriber-services`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bookingDetails),
+    });
+  };
+
+  // Fetch services and package services
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BACKEND_HOST}/alacarteservices/active`);
-        const data = await response.json();
-        setServices(data);
+        setFetchingData(true);
+
+        // Fetch general services
+        const serviceResponse = await fetch(
+          `${BACKEND_HOST}/alacarteservices/active`
+        );
+        const servicesData = await serviceResponse.json();
+        setServices(servicesData);
+
+        // Fetch package services based on subscriber ID
+        if (id) {
+          const packageResponse = await fetch(
+            `${BACKEND_HOST}/subscribers/${id}`
+          );
+          const packageData = await packageResponse.json();
+          setPackageServices(packageData.packageServices || []);
+        }
       } catch (error) {
         Alert.alert("Error Occurred", error.message);
+      } finally {
+        setFetchingData(false);
       }
     };
-    fetchData();
-  }, []);
 
-  const handleServiceSelect = (service) => {
+    // Only fetch data once profile is available
+    if (id) {
+      fetchData();
+    }
+  }, [id]);
+
+  // Handle service selection
+  const [packageService, setPackageService] = useState();
+  const handleServiceSelect = (service, no) => {
     setSelectedService(service);
-    setModalVisible(true);
+
+    if (no === 1) {
+      console.log("Package Service");
+
+      setConfirmBookingVisible(true);
+      setPackageService(1);
+    } else {
+      setModalVisible(true);
+    }
   };
 
+  // Render icons for the services
   const renderIcon = (serviceName) => {
     switch (serviceName) {
       case "Phone Call":
@@ -122,6 +213,7 @@ console.log("response booking",response);
     }
   };
 
+  // Handle proceeding to confirm booking
   const handleProceed = () => {
     if (!Object.keys(profile).length) {
       Alert.alert(
@@ -140,38 +232,9 @@ console.log("response booking",response);
     setConfirmBookingVisible(true);
     setModalVisible(false);
   };
+
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={services}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.serviceItem}
-            onPress={() => handleServiceSelect(item)}
-          >
-            <View style={styles.serviceIconContainer}>
-              {renderIcon(item.serviceName)}
-            </View>
-            <View style={styles.serviceDetailsContainer}>
-              <Text style={styles.serviceText}>{item.serviceName}</Text>
-              <Text style={styles.priceText}>
-                ₹{item.priceINR} / ${item.priceUSD}
-              </Text>
-              <Text style={styles.descriptionText}>
-                {item.serviceDescription}
-              </Text>
-            </View>
-            <Feather
-              name="chevron-right"
-              size={24}
-              color={Color.appDefaultColor}
-            />
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.serviceID}
-        contentContainerStyle={styles.list}
-      />
-
       {/* Service Modal */}
       {modalVisible && selectedService && (
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -193,20 +256,11 @@ console.log("response booking",response);
                   Price: ₹{selectedService.priceINR} / $
                   {selectedService.priceUSD}
                 </Text>
-                {/* <Text style={styles.modalDetails}>
-                  <Feather
-                    name="clock"
-                    size={16}
-                    color={Color.appDefaultColor}
-                  />{" "}
-                  Business Hours: {selectedService.businessHoursStart} to{" "}
-                  {selectedService.businessHoursEnd}
-                </Text> */}
 
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={handleProceed}
-                    style={[styles.proceedButton, styles.modalProceedButton]}
+                    style={[styles.proceedButton]}
                   >
                     <Text style={styles.buttonText}>
                       <Feather
@@ -231,7 +285,61 @@ console.log("response booking",response);
           </TouchableWithoutFeedback>
         </Modal>
       )}
-
+      {fetchingData ? (
+        <ActivityIndicator size="large" color={Color.appDefaultColor} />
+      ) : (
+        <ScrollView>
+          <View>
+            {/* Available Services Section */}
+            {/* Package Services Section */}
+            {packageServices.length > 0 && (
+              <>
+                <Text style={styles.sectionHeader}>Your Package Services</Text>
+                {packageServices.map((service) => (
+                  <TouchableOpacity
+                    key={service.serviceID}
+                    style={styles.packageServiceItem}
+                    onPress={() => handleServiceSelect(service, 1)}
+                  >
+                    <View style={styles.serviceIconContainer}>
+                      {renderIcon(service.serviceName)}
+                    </View>
+                    <View style={styles.serviceDetailsContainer}>
+                      <Text style={styles.serviceText}>
+                        {service.serviceName}
+                      </Text>
+                      <Text style={styles.descriptionText}>
+                        Included in your package
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </>
+            )}
+            <Text style={styles.sectionHeader}>Ala-Carte Services</Text>
+            {services.map((service) => (
+              <TouchableOpacity
+                key={service.serviceID}
+                style={styles.serviceItem}
+                onPress={() => handleServiceSelect(service)}
+              >
+                <View style={styles.serviceIconContainer}>
+                  {renderIcon(service.serviceName)}
+                </View>
+                <View style={styles.serviceDetailsContainer}>
+                  <Text style={styles.serviceText}>{service.serviceName}</Text>
+                  <Text style={styles.priceText}>
+                    ₹{service.priceINR} / ${service.priceUSD}
+                  </Text>
+                  <Text style={styles.descriptionText}>
+                    {service.serviceDescription}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      )}
       {/* Confirm Booking Modal */}
       {confirmBookingVisible && selectedService && (
         <Modal
@@ -247,7 +355,6 @@ console.log("response booking",response);
                     name="calendar"
                     size={22}
                     color={Color.appDefaultColor}
-                    style={{ marginRight: 10 }}
                   />{" "}
                   Schedule {selectedService.serviceName}
                 </Text>
@@ -272,7 +379,7 @@ console.log("response booking",response);
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={handleConfirm}
-                    style={[styles.proceedButton, styles.modalProceedButton]}
+                    style={[styles.proceedButton]}
                   >
                     <Text style={styles.confirmButtonText}>
                       {loading ? (
@@ -311,12 +418,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff", // Softer background color for a professional look
+    backgroundColor: "#fff",
   },
-
   list: {
     paddingBottom: 20,
-    marginTop: 20,
   },
   serviceItem: {
     flexDirection: "row",
@@ -332,10 +437,24 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     elevation: 3,
   },
+  packageServiceItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Color.lavender,
+    padding: 20,
+    borderRadius: 15,
+    marginHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    marginVertical: 10,
+    elevation: 3,
+  },
   serviceIconContainer: {
     marginRight: 15,
     padding: 10,
-    backgroundColor: Color.lightOrange,
+    backgroundColor: "#fff",
     borderRadius: 10,
   },
   serviceDetailsContainer: {
@@ -357,18 +476,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#777",
   },
-  iconPosition: {
-    position: "absolute",
-    top: -14,
-    right: 5,
-    backgroundColor: Color.appDefaultColor,
-    borderRadius: 14,
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    paddingLeft: 20,
+    marginTop: 20,
+    marginBottom: 10,
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background for focus
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
     width: "90%",
@@ -401,11 +521,6 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
   },
-  modalDetails: {
-    fontSize: 14,
-    color: "#777",
-    marginBottom: 15,
-  },
   datePickerButton: {
     backgroundColor: "#f0f0f0",
     padding: 12,
@@ -428,22 +543,16 @@ const styles = StyleSheet.create({
     marginRight: 10,
     flex: 1,
   },
-  modalProceedButton: {},
+  confirmButtonText: {
+    color: Color.appDefaultColor,
+    fontSize: 16,
+    fontWeight: "600",
+  },
   cancelButton: {
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
     flex: 1,
-  },
-  buttonText: {
-    color: Color.appDefaultColor,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  confirmButtonText: {
-    color: Color.appDefaultColor,
-    fontSize: 16,
-    fontWeight: "600",
   },
   cancelButtonText: {
     color: "#ff5c5c",

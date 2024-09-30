@@ -32,16 +32,26 @@ const PackagesDetails = () => {
   const renderPackageItem = ({ item }) => (
     <Animated.View style={[styles.packageCard, animatedStyle]}>
       <View style={styles.cardBackground}>
-        <View style={styles.packageHeader}>
-          <Text style={styles.packageName}>{item.packageName}</Text>
-        </View>
-
-        <View style={styles.packagePriceContainer}>
-          <View style={styles.priceWrapper}>
-            <Text style={styles.packagePrice}>
-              ₹{item.priceINR || "N/A"}/${item.priceUSD || "N/A"}
+        <View
+          style={{
+            backgroundColor: Color.appDefaultColor,
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+          }}
+        >
+          <View style={styles.packageHeader}>
+            <Text style={styles.packageName}>
+              {item.packageName.toUpperCase()}
             </Text>
-            <Text style={styles.packageSubtitle}>Per User/Month</Text>
+          </View>
+
+          <View style={styles.packagePriceContainer}>
+            <View style={styles.priceWrapper}>
+              <Text style={styles.packagePrice}>
+                ₹{item.priceINR || "N/A"}/${item.priceUSD || "N/A"}
+              </Text>
+              <Text style={styles.packageSubtitle}>Per User/Month</Text>
+            </View>
           </View>
         </View>
 
@@ -65,7 +75,7 @@ const PackagesDetails = () => {
           style={styles.subscribeButton}
           onPress={() => handleSubscribe(item)}
         >
-          <Text style={styles.subscribeButtonText}>Choose Plan</Text>
+          <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -201,7 +211,7 @@ const styles = StyleSheet.create({
   cardBackground: {
     position: "relative",
     borderRadius: 10,
-    width: "90%",
+    width: "80%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
@@ -218,31 +228,34 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   packageName: {
-    fontSize: 22,
-    color: Color.colorDarkslategray,
-    fontWeight: "600",
+    fontSize: 32,
+    color: "#fff",
+    fontWeight: "800",
     letterSpacing: 2,
+    backgroundColor: Color.appDefaultColor,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    marginTop: 15,
   },
   packagePriceContainer: {
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-around",
   },
   priceWrapper: {
-    backgroundColor: Color.lightOrange,
-    padding: 8,
+    paddingHorizontal: 8,
     borderRadius: 10,
     alignItems: "center",
   },
   packagePrice: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: Color.appDefaultColor,
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#fff",
   },
   packageSubtitle: {
     fontSize: 14,
-    color: "#888",
+    color: "#fff",
   },
   servicesList: {
     marginBottom: 20,
@@ -254,6 +267,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 5,
+    maxWidth: "90%",
   },
   serviceIcon: {
     marginRight: 10,

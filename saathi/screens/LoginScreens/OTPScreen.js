@@ -18,10 +18,11 @@ import OTP from "../../assets/imgs/OtpScreen.svg";
 import { Route } from "../../routes";
 import { BACKEND_HOST } from "../../config";
 
+
 export default function OtpScreen({ route }) {
   const [loader, setLoader] = useState(false);
-  const [error, setError] = useState(null);
-  const email = route.params?.email;
+  const [error, setError] = useState("");
+  const email = route?.params?.email || "default_email@example.com";
   const navigation = useNavigation(); // Navigation hook
 
   // Function to handle OTP verification

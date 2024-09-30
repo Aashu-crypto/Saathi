@@ -52,7 +52,9 @@ const MyPackage = () => {
               {interaction.description || "No description"}
             </Text>
             {interaction.documents && (
-              <Text style={styles.documentText}>Document: {interaction.documents}</Text>
+              <Text style={styles.documentText}>
+                Document: {interaction.documents}
+              </Text>
             )}
           </View>
         ))}
@@ -71,7 +73,10 @@ const MyPackage = () => {
     return (
       <TouchableOpacity
         onLongPress={() => handleLongPress(item.packageServiceID)}
-        style={[styles.logItem, isCompleted ? styles.completed : styles.pending]}
+        style={[
+          styles.logItem,
+          isCompleted ? styles.completed : styles.pending,
+        ]}
       >
         <View style={styles.header}>
           <Text style={styles.service}>{item.serviceName}</Text>
@@ -100,7 +105,9 @@ const MyPackage = () => {
             <Ionicons name={packageData.icon} size={28} color="#FFF" />
             <Text style={styles.packageTitle}>{packageData.title}</Text>
           </View>
-          <Text style={styles.packageDescription}>{packageData.description}</Text>
+          <Text style={styles.packageDescription}>
+            {packageData.description}
+          </Text>
           <Text style={styles.packagePrice}>{packageData.price}</Text>
         </View>
         <FlatList

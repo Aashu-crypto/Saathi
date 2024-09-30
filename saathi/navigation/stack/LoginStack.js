@@ -13,28 +13,6 @@ import PasswordScreen from "../../screens/LoginScreens/ConfirmPassword";
 
 const LoginStack = () => {
   const Stack = createStackNavigator();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const no = await AsyncStorage.getItem("number");
-        console.log("Retrieved number:", no);
-        setUser(no);
-      } catch (error) {
-        console.log("Error fetching user number:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getUser();
-  }, []);
-
-  if (loading) {
-    // You can return a loading indicator here if you prefer
-    return null;
-  }
 
   return (
     <Stack.Navigator
