@@ -212,7 +212,7 @@ const Account = ({ navigation }) => {
                       </View>
 
                       {/* Loop through packageServices to display services included */}
-                      {packageData.packageServices.map((service) => {
+                      {packageData?.packageServices?.map((service) => {
                         // Filter non-ala carte services from the services array
                         const nonAlaCarteService = packageData.services.find(
                           (s) =>
@@ -243,13 +243,36 @@ const Account = ({ navigation }) => {
                                 }}
                               >
                                 <Text style={styles.pendingStatus}>
-                                  Pending: {nonAlaCarteService.pending}
+                                  {nonAlaCarteService.completions} of{" "}
+                                  {nonAlaCarteService.pending +
+                                    nonAlaCarteService.completions}{" "}
+                                  completed
                                 </Text>
                               </View>
                             )}
                           </Pressable>
                         );
                       })}
+
+                      <View
+                        style={{
+                          backgroundColor: Color.appDefaultColor,
+                          alignItems: "center",
+                          borderRadius: 20,
+                          padding: 10,
+                          marginTop: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#fff",
+                            fontFamily: FontFamily.poppinsRegular,
+                            fontWeight: "400",
+                          }}
+                        >
+                          Upgrade Your Package
+                        </Text>
+                      </View>
                     </View>
                   ) : (
                     <Text>{item.content}</Text>

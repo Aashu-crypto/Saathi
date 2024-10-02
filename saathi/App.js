@@ -8,10 +8,13 @@ import { store } from "./Redux/Store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import RootStack from "./navigation/RootStack";
 import { PaperProvider } from "react-native-paper";
+
 export default function App() {
   const [loaded, error] = useFonts({
     "Dream-Orphans": require("./assets/fonts/Dream_Orphans.otf"),
     "Dream-Orphans-bd": require("./assets/fonts/Dream_Orphans_Bd.otf"),
+    "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
   });
   if (!loaded && !error) {
     return null;

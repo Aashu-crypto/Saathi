@@ -11,13 +11,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import OTPInputView from "@twotalltotems/react-native-otp-input"; // OTP Input Library
+import { OtpInput } from "react-native-otp-entry"; // Updated OTP Input Library
 import { useNavigation } from "@react-navigation/native"; // For Navigation
 import { Color, FontFamily } from "../../GlobalStyles";
 import OTP from "../../assets/imgs/OtpScreen.svg";
 import { Route } from "../../routes";
 import { BACKEND_HOST } from "../../config";
-
 
 export default function OtpScreen({ route }) {
   const [loader, setLoader] = useState(false);
@@ -46,7 +45,6 @@ export default function OtpScreen({ route }) {
         // Handling different response statuses
         if (response.ok && result === 1) {
           setLoader(false);
-          // Alert.alert("Success", "OTP verified successfully.");
           navigation.navigate(Route.CONFIRMPASSWORD, {
             email: email,
           });
@@ -100,13 +98,17 @@ export default function OtpScreen({ route }) {
             </Text>
 
             {/* OTP Input */}
-            <OTPInputView
-              style={styles.otpContainer}
-              pinCount={6}
-              autoFocusOnLoad
-              codeInputFieldStyle={styles.otpInput}
-              codeInputHighlightStyle={styles.otpHighlight}
-              onCodeFilled={handleVerifyOtp}
+            <OtpInput
+              length={6}
+              theme={{
+                containerStyle: styles.otpContainer,
+                pinCodeContainerStyle: styles.otpInput,
+                pinCodeTextStyle: styles.pinCodeText,
+                focusStickStyle: styles.focusStick,
+                focusedPinCodeContainerStyle: styles.activePinCodeContainer,
+              }}
+              onFilled={handleVerifyOtp}
+              onChangeText={(text) => setError(null)}
             />
 
             {/* Error message */}
@@ -155,8 +157,9 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   otpContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     width: "90%",
-    height: 100,
     marginBottom: 20,
   },
   otpInput: {
@@ -170,9 +173,6 @@ const styles = StyleSheet.create({
     borderColor: Color.appDefaultColor,
     textAlign: "center",
     margin: 2,
-  },
-  otpHighlight: {
-    borderColor: Color.appDefaultColor,
   },
   errorText: {
     color: "red",

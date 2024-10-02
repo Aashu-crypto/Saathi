@@ -7,7 +7,6 @@ import {
   FlatList,
   ScrollView,
 } from "react-native";
-import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Color, FontFamily, width } from "../../GlobalStyles";
 
 import Accordion from "../Accordion";

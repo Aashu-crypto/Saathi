@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
 
 import FeedStack from "../stack/FeedStack";
 import AccountStack from "../stack/AccountStack";
@@ -8,8 +10,20 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { Color } from "../../GlobalStyles";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Service from "../../screens/service/Service";
+
 const BottomTab = () => {
   const Tab = createBottomTabNavigator();
+  const profile = useSelector((state) => state.profile.data);
+  const [tabBtnStatus, setTabBtnStatus] = useState(false);
+
+  useEffect(() => {
+    if (Object.keys(profile).length === 0) {
+      setTabBtnStatus(true); // Disable tab if profile is empty
+    } else {
+      setTabBtnStatus(false); // Enable tab if profile has data
+    }
+  }, [profile]);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -24,7 +38,6 @@ const BottomTab = () => {
         component={FeedStack}
         options={{
           title: "Home",
-
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="home"
@@ -38,10 +51,9 @@ const BottomTab = () => {
         name={Route.SERVICE_STACK}
         component={Service}
         options={{
-          title: "Schedule Services",
+          title: "Services",
           headerShown: true,
           headerTitleAlign: "center",
-
           headerTitleStyle: {
             fontFamily: "Dream-Orphans-bd",
             color: Color.appDefaultColor,
@@ -53,6 +65,13 @@ const BottomTab = () => {
               name="briefcase"
               size={25}
               color={focused ? Color.appDefaultColor : Color.colorSilver}
+            />
+          ),
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              {...props}
+              disabled={tabBtnStatus} // Disable based on tabBtnStatus state
+              style={{ opacity: tabBtnStatus ? 0.5 : 1 }} // Adjust opacity based on state
             />
           ),
         }}

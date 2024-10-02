@@ -62,8 +62,6 @@ const ServiceSelector = () => {
       return;
     }
 
-  
-
     const bookingDetails = {
       serviceID: selectedService.serviceID,
       serviceDate: date.toISOString().split("T")[0], // Extract date in YYYY-MM-DD format
@@ -155,7 +153,8 @@ const ServiceSelector = () => {
             `${BACKEND_HOST}/subscribers/${id}`
           );
           const packageData = await packageResponse.json();
-          setPackageServices(packageData.packageServices || []);
+         const data = packageData.services.filter(item=>item.alaCarte ===false)
+          setPackageServices(data|| []);
         }
       } catch (error) {
         Alert.alert("Error Occurred", error.message);
@@ -300,6 +299,7 @@ const ServiceSelector = () => {
                     key={service.serviceID}
                     style={styles.packageServiceItem}
                     onPress={() => handleServiceSelect(service, 1)}
+                    activeOpacity={0.7}
                   >
                     <View style={styles.serviceIconContainer}>
                       {renderIcon(service.serviceName)}
@@ -311,6 +311,9 @@ const ServiceSelector = () => {
                       <Text style={styles.descriptionText}>
                         Included in your package
                       </Text>
+                      <Text style={styles.pendingText}>
+                        {service.completions} of {service.pending +service.completions } completed
+                      </Text>
                     </View>
                   </TouchableOpacity>
                 ))}
@@ -320,7 +323,8 @@ const ServiceSelector = () => {
             {services.map((service) => (
               <TouchableOpacity
                 key={service.serviceID}
-                style={styles.serviceItem}
+                style={styles.packageServiceItem}
+                activeOpacity={0.7}
                 onPress={() => handleServiceSelect(service)}
               >
                 <View style={styles.serviceIconContainer}>

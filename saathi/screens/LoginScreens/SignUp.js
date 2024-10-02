@@ -35,7 +35,7 @@ export default function SignUp({ navigation }) {
   const [otp, setOtp] = useState(""); // OTP state
   const [otpVerified, setOtpVerified] = useState(false); // OTP verification state
   const [loader, setLoader] = useState(false); // loader for Sign Up
-  const [countryCode, setCountryCode] = useState("");
+  const [countryCode, setCountryCode] = useState("91");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -44,7 +44,9 @@ export default function SignUp({ navigation }) {
   const dispatch = useDispatch();
 
   const handleSubmit = async () => {
-    console.log();
+    navigation.navigate(Route.OTPSCREEN, {
+      email: email,
+    });
 
     if (!firstName || !lastName || !email) {
       Alert.alert(
@@ -163,7 +165,7 @@ export default function SignUp({ navigation }) {
                   <PhoneInput
                     ref={phoneInput}
                     defaultValue={number}
-                    defaultCode="US"
+                    defaultCode="IN"
                     layout="first"
                     onChangeText={(text) => {
                       setNumber(text);
@@ -176,7 +178,7 @@ export default function SignUp({ navigation }) {
                     }}
                     withDarkTheme
                     withShadow
-                    autoFocus
+                    
                     containerStyle={styles.phoneInput}
                     textContainerStyle={styles.phoneInputText}
                   />

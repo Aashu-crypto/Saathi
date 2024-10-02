@@ -99,11 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontFamily: FontFamily.poppinsBold,
     marginLeft: 5,
+    width:'90%'
   },
   benefitText: {
     fontSize: 13,
     fontWeight: "400",
     color: Color.colorDarkslategray,
     textAlign: "center",
+    fontFamily:FontFamily.poppinsRegular
   },
 });
