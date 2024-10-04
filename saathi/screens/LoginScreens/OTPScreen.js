@@ -26,9 +26,7 @@ export default function OtpScreen({ route }) {
 
   // Function to handle OTP verification
   const handleVerifyOtp = async (otp) => {
-    navigation.navigate(Route.CONFIRMPASSWORD, {
-      email: email,
-    });
+
     if (otp && otp.length === 6) {
       setLoader(true);
       setError(null); // Clear previous error

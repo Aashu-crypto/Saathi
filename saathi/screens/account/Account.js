@@ -22,12 +22,13 @@ import { BACKEND_HOST } from "../../config";
 import { isLoaded } from "expo-font";
 import ContentLoader from "../../components/ContentLoader";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { billingStatus } from "../../Redux/Slice/BillingStatusSlice";
 const Account = ({ navigation }) => {
   const profileOptionsData = [
     {
       title: "Your Saathi",
       route: Route.YOURSAATHI,
-      content: "Details about Your Saathi.",
+      content: "We will assign saathi to you",
       type: "saathi", // Identifier for Saathi content
     },
     {
@@ -295,11 +296,9 @@ const Account = ({ navigation }) => {
               await AsyncStorage.removeItem("Email");
               dispatch(profileData([]));
               dispatch(screen(Route.LOGIN));
+              dispatch(billingStatus(0))
               // Optionally, reset the navigation stack to prevent going back
-              navigation.reset({
-                index: 0,
-                routes: [{ name: Route.LOGIN }],
-              });
+           
             }}
             style={styles.logoutButton}
           >

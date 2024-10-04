@@ -15,14 +15,15 @@ import {
 } from "redux-persist";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import heightSlice from "./Slice/heightSlice";
+
 import articleIdSlice from "./Slice/ArticleIdSlice";
 import { tokenSlice } from "./Slice/TokenSlice";
 import packageSlice from "./Slice/packageSlice";
 import userPackageSlice from "./Slice/UserPackageSlice";
+import BillingStatusSlice from "./Slice/BillingStatusSlice";
 const rootReducer = combineReducers({
   screen: screenSlice,
-  height: heightSlice,
+  status: BillingStatusSlice,
   index: indexSlice,
   userPackage: userPackageSlice,
   subscriptionPackages: packageSlice,

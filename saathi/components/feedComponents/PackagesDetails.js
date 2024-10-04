@@ -4,6 +4,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Animated, {
@@ -16,6 +17,8 @@ import { screen } from "../../Redux/Slice/screenNameSlice";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Color, FontFamily, width } from "../../GlobalStyles";
 import { subscriptionPackages } from "../../Redux/Slice/packageSlice";
+import { BACKEND_HOST } from "../../config";
+import { billingStatus } from "../../Redux/Slice/BillingStatusSlice";
 
 const PackagesDetails = () => {
   const [packages, setPackages] = useState([]);
@@ -26,7 +29,51 @@ const PackagesDetails = () => {
   const [scrollIndex, setScrollIndex] = useState(0); // Keep track of the current scroll position
 
   const handleSubscribe = (item) => {
-    dispatch(screen("LOGIN"));
+    console.log(item);
+
+    if (Object.keys(profile).length === 0) {
+      dispatch(screen("LOGIN"));
+    } else {
+      Alert.alert("Payment ", "Payment Done Successfully", [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => handlePayment(item.packageID) },
+      ]);
+    }
+  };
+
+  const handlePayment = async (id) => {
+    console.log(id);
+    try {
+      const response = await fetch(
+        `${BACKEND_HOST}/subscribers/${profile.subscriberID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json", // Set content type to JSON
+          },
+          body: JSON.stringify({
+            billingStatus: 1,
+            packageID: id,
+            status: 1,
+          }), // Convert the body to a JSON string
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update payment status"); // Handle HTTP errors
+      }
+      dispatch(billingStatus(1));
+
+      const json = await response.json();
+      console.log(json);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Status", "Payment Status is not Updated");
+    }
   };
 
   const renderPackageItem = ({ item }) => (

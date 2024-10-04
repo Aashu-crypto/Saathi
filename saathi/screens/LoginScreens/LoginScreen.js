@@ -26,6 +26,7 @@ import { useDispatch } from "react-redux";
 import { screen } from "../../Redux/Slice/screenNameSlice";
 import { profileData } from "../../Redux/Slice/ProfileDataSlice";
 import SignUpSvg from "../../assets/imgs/signup.svg";
+import { billingStatus } from "../../Redux/Slice/BillingStatusSlice";
 export default function LoginScreen({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -73,16 +74,17 @@ export default function LoginScreen({ navigation }) {
       console.log("Login successful:", json);
 
       dispatch(profileData(json));
+      dispatch(billingStatus(json.billingStatus));
 
       // Navigate to the main screen
       dispatch(screen(Route.MAIN));
-      setLoader(true);
+      setLoader(false);
       // Optionally, clear the input fields after successful login
       setEmail("");
       setPassword("");
     } catch (error) {
       console.error("Error during login:", error);
-      setLoader(true);
+      setLoader(false);
       Alert.alert(
         "Login Error",
         "An error occurred during the login process. Please check your network connection and try again."
@@ -355,7 +357,6 @@ const styles = StyleSheet.create({
   },
   termsLink: {
     color: Color.appDefaultColor,
-    
   },
   login: {
     backgroundColor: Color.appDefaultColor,

@@ -35,7 +35,7 @@ const ServiceSelector = () => {
   const [fetchingData, setFetchingData] = useState(true);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile.data || {});
-
+const status = useSelector(state=>state.status.status)
   const id = profile.subscriberID;
 
   // Handle date change for the booking
@@ -84,6 +84,7 @@ const ServiceSelector = () => {
       }
 
       if (!response.ok) {
+
         const errorText = await response.text();
         throw new Error(
           errorText || "Failed to book the service. Please try again."
@@ -167,7 +168,7 @@ const ServiceSelector = () => {
     if (id) {
       fetchData();
     }
-  }, [id]);
+  }, [id,status]);
 
   // Handle service selection
   const [packageService, setPackageService] = useState();
@@ -180,6 +181,7 @@ const ServiceSelector = () => {
       setConfirmBookingVisible(true);
       setPackageService(1);
     } else {
+      setPackageService(0)
       setModalVisible(true);
     }
   };

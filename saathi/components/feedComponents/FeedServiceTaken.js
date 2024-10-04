@@ -16,12 +16,12 @@ import ContentLoader from "../ContentLoader";
 
 const { width } = Dimensions.get("window");
 
-const ServicesTaken = () => {
+const FeedServiceTaken = () => {
   const [request, setRequest] = useState([]);
   const [feedData, setFeedData] = useState(null);
   const [loading, setLoading] = useState(false);
   const profile = useSelector((state) => state.profile.data);
-
+  const status = useSelector((state) => state.status.status);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -70,7 +70,7 @@ const ServicesTaken = () => {
       }
     };
     fetchData();
-  }, [profile]);
+  }, [profile, status]);
 
   const renderServiceCard = ({ item }) => (
     <View>
@@ -84,7 +84,7 @@ const ServicesTaken = () => {
           <Image
             source={{ uri: item.documents }}
             style={styles.cardImage}
-            resizeMode="stretch"
+            resizeMode="contain"
           />
         )}
         <View style={{ padding: 10 }}>
@@ -101,7 +101,7 @@ const ServicesTaken = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Feeds</Text>
+      {/* <Text style={styles.title}>Feeds</Text> */}
       {request.length === 0 ? (
         <ScrollView style={styles.scrollContainer}>
           {feedData && (
@@ -115,7 +115,7 @@ const ServicesTaken = () => {
           )}
         </ScrollView>
       ) : (
-        <View>
+        <View style={{ marginTop: 10 }}>
           <FlatList
             data={request}
             renderItem={renderServiceCard}
@@ -220,7 +220,7 @@ const SaathiDetailsCard = ({ saathi }) => (
   </Card>
 );
 
-export default ServicesTaken;
+export default FeedServiceTaken;
 
 const styles = StyleSheet.create({
   container: {

@@ -65,7 +65,7 @@ export default function PasswordScreen({ route }) {
       if (response.ok) {
         // Handle successful response
         setLoader(false);
-        Alert.alert("Success", "Password set successfully!");
+        Alert.alert("Success", "Account created successfully!");
         dispatch(screen(Route.MAIN)); // Navigate to the main screen after success
       } else {
         // Handle API error

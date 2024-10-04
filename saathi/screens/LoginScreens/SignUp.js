@@ -24,6 +24,7 @@ import { profileData } from "../../Redux/Slice/ProfileDataSlice";
 import SignUpSvg from "../../assets/imgs/signup.svg";
 import PhoneInput from "react-native-phone-number-input"; // Import the library
 import { Color } from "../../GlobalStyles";
+import { billingStatus } from "../../Redux/Slice/BillingStatusSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -44,27 +45,31 @@ export default function SignUp({ navigation }) {
   const dispatch = useDispatch();
 
   const handleSubmit = async () => {
-    navigation.navigate(Route.OTPSCREEN, {
-      email: email,
-    });
-
+    // Check if the phone number is valid using the phoneInput reference
+    const isValid = phoneInput.current?.isValidNumber(number);
+  
     if (!firstName || !lastName || !email) {
-      Alert.alert(
-        "Please fill all the fields and verify OTP before submitting"
-      );
+      Alert.alert("Please fill all the fields before submitting");
       return;
     }
+  
+    if (!isValid) {
+      Alert.alert("Invalid Phone Number", "Please enter a valid phone number.");
+      return;
+    }
+  
     setLoader(true);
-
+  
     const formData = {
       firstName,
       lastName,
       email,
-      contactNo: number, // Use formatted number
+      contactNo: formattedValue, // Use formatted number
       countryCode,
     };
+  
     console.log(formData);
-
+  
     try {
       const response = await fetch(
         `https://saathi.etheriumtech.com:444/Saathi/subscribers/register`,
@@ -76,15 +81,15 @@ export default function SignUp({ navigation }) {
           body: JSON.stringify(formData),
         }
       );
-
+  
       const json = await response.json();
       if (response.ok) {
         dispatch(profileData(json));
+        dispatch(billingStatus(json.billingStatus));
         navigation.navigate(Route.OTPSCREEN, {
           email: email,
         });
         setLoader(false);
-    
       } else {
         setLoader(false);
         Alert.alert("Error", json.message || "Please fill all the fields");
@@ -94,29 +99,7 @@ export default function SignUp({ navigation }) {
       Alert.alert("Error", "An error occurred. Please fill all the forms");
     }
   };
-
-  const handlePhoneNumberSubmit = () => {
-    const checkValid = phoneInput.current?.isValidNumber(number); // Check if the phone number is valid
-
-    if (!checkValid) {
-      Alert.alert("Please enter a valid phone number");
-      return;
-    }
-
-    // Simulate sending OTP here
-    setOtpSent(true);
-    Alert.alert("OTP sent!", "Please check your phone for the OTP.");
-  };
-
-  const handleVerifyOtp = () => {
-    if (otp !== "1234") {
-      // Replace with actual OTP verification logic
-      Alert.alert("Invalid OTP", "Please enter the correct OTP.");
-      return;
-    }
-    setOtpVerified(true);
-    Alert.alert("OTP Verified!", "You can now submit the form.");
-  };
+  
 
   return (
     <KeyboardAvoidingView
@@ -178,7 +161,6 @@ export default function SignUp({ navigation }) {
                     }}
                     withDarkTheme
                     withShadow
-                    
                     containerStyle={styles.phoneInput}
                     textContainerStyle={styles.phoneInputText}
                   />

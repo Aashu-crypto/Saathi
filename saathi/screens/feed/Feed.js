@@ -11,6 +11,9 @@ import { BACKEND_HOST } from "../../config";
 const Feed = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const profile = useSelector((state) => state.profile.data || {});
+  const status = useSelector((state) => state.status.status);
+  console.log(status);
+
   const [subscriberData, setSubscriberData] = useState();
 
   useEffect(() => {
@@ -49,16 +52,16 @@ const Feed = () => {
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
       <StatusBar style="dark" />
 
-      {Object.keys(profile).length !== 0 &&
+      {/* {Object.keys(profile).length !== 0 &&
         !isLoaded &&
         subscriberData &&
-        (subscriberData.billingStatus === 0 ? (
+        (status !== 0 ? (
           <HomeScreen />
         ) : (
           <ServicesTaken />
-        ))}
+        ))} */}
 
-      {Object.keys(profile).length === 0 && <HomeScreen />}
+      <HomeScreen />
     </View>
   );
 };
