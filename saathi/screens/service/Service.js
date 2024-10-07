@@ -22,6 +22,7 @@ import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
 
 const ServiceSelector = () => {
   const [selectedService, setSelectedService] = useState(null);
@@ -35,9 +36,45 @@ const ServiceSelector = () => {
   const [fetchingData, setFetchingData] = useState(true);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile.data || {});
-const status = useSelector(state=>state.status.status)
+  const status = useSelector((state) => state.status.status);
   const id = profile.subscriberID;
-
+  const [subscriberData, setSubscriberData] = useState();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [btnDisabled, setBtnDisabled] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoaded(true);
+      try {
+        const response = await fetch(
+          `${BACKEND_HOST}/subscribers/${profile.subscriberID}`
+        );
+        if (!response.ok) {
+          const errorMessage = await response.text(); // Get error response message
+          Alert.alert(
+            "Error Fetching Information",
+            errorMessage || "Unknown error occurred"
+          );
+          return;
+        }
+        const json = await response.json();
+        setSubscriberData(json);
+        if (json.saathi) {
+          setBtnDisabled(false);
+        }
+      } catch (error) {
+        Alert.alert(
+          "Network Error",
+          "Unable to fetch data. Please check your connection."
+        );
+        console.log(error);
+      } finally {
+        setIsLoaded(false);
+      }
+    };
+    if (Object.keys(profile).length !== 0) {
+      fetchData();
+    }
+  }, [profile]);
   // Handle date change for the booking
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -84,7 +121,6 @@ const status = useSelector(state=>state.status.status)
       }
 
       if (!response.ok) {
-
         const errorText = await response.text();
         throw new Error(
           errorText || "Failed to book the service. Please try again."
@@ -154,8 +190,10 @@ const status = useSelector(state=>state.status.status)
             `${BACKEND_HOST}/subscribers/${id}`
           );
           const packageData = await packageResponse.json();
-         const data = packageData.services.filter(item=>item.alaCarte ===false)
-          setPackageServices(data|| []);
+          const data = packageData.services.filter(
+            (item) => item.alaCarte === false
+          );
+          setPackageServices(data || []);
         }
       } catch (error) {
         Alert.alert("Error Occurred", error.message);
@@ -168,7 +206,7 @@ const status = useSelector(state=>state.status.status)
     if (id) {
       fetchData();
     }
-  }, [id,status]);
+  }, [id, status]);
 
   // Handle service selection
   const [packageService, setPackageService] = useState();
@@ -181,7 +219,7 @@ const status = useSelector(state=>state.status.status)
       setConfirmBookingVisible(true);
       setPackageService(1);
     } else {
-      setPackageService(0)
+      setPackageService(0);
       setModalVisible(true);
     }
   };
@@ -301,6 +339,7 @@ const status = useSelector(state=>state.status.status)
                     key={service.serviceID}
                     style={styles.packageServiceItem}
                     onPress={() => handleServiceSelect(service, 1)}
+                    disabled={btnDisabled}
                     activeOpacity={0.7}
                   >
                     <View style={styles.serviceIconContainer}>
@@ -314,7 +353,8 @@ const status = useSelector(state=>state.status.status)
                         Included in your package
                       </Text>
                       <Text style={styles.pendingText}>
-                        {service.completions} of {service.pending +service.completions } completed
+                        {service.completions} of{" "}
+                        {service.pending + service.completions} completed
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -325,8 +365,12 @@ const status = useSelector(state=>state.status.status)
             {services.map((service) => (
               <TouchableOpacity
                 key={service.serviceID}
-                style={styles.packageServiceItem}
+                style={[
+                  styles.packageServiceItem,
+                  { opacity: btnDisabled && 0.6 },
+                ]}
                 activeOpacity={0.7}
+                disabled={btnDisabled}
                 onPress={() => handleServiceSelect(service)}
               >
                 <View style={styles.serviceIconContainer}>
