@@ -102,7 +102,7 @@ const ServiceSelector = () => {
     const bookingDetails = {
       serviceID: selectedService.serviceID,
       serviceDate: date.toISOString().split("T")[0], // Extract date in YYYY-MM-DD format
-      serviceTime: date.toTimeString().split(" ")[0], // Extract time in HH:MM:SS format
+      serviceTime: date.toTimeString().split(" ")[0].slice(0, 5), // Extract time in HH:MM:SS format
       billingStatus: 1,
       subscriberID: profile.subscriberID,
     };
@@ -152,8 +152,8 @@ const ServiceSelector = () => {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        requestedDate: bookingDetails.serviceDate,
-        requestedTime: bookingDetails.serviceTime,
+        preferredDate: bookingDetails.serviceDate,
+        preferredTime: bookingDetails.serviceTime,
         subscriberID: bookingDetails.subscriberID,
         serviceID: bookingDetails.serviceID,
       }),

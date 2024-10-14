@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert } from "react-native";
 
 import ServicesTaken from "../../components/feedComponents/ServicesTaken";
 import { StatusBar } from "expo-status-bar";
-
+import NetInfo from "@react-native-community/netinfo";
 import { useSelector } from "react-redux";
 import HomeScreen from "../../components/feedComponents/HomeScreen";
 import { BACKEND_HOST } from "../../config";
