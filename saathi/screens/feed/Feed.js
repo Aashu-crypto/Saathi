@@ -51,17 +51,7 @@ const Feed = () => {
   return (
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
       <StatusBar style="dark" />
-
-      {/* {Object.keys(profile).length !== 0 &&
-        !isLoaded &&
-        subscriberData &&
-        (status !== 0 ? (
-          <HomeScreen />
-        ) : (
-          <ServicesTaken />
-        ))} */}
-
-      <HomeScreen />
+  <HomeScreen />
     </View>
   );
 };

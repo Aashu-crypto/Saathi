@@ -8,16 +8,20 @@ import {
   ScrollView,
 } from "react-native";
 import { Color, FontFamily, width } from "../../GlobalStyles";
-
+import NetInfo from "@react-native-community/netinfo";
 import Accordion from "../Accordion";
 import AllCuresBlog from "./AllCuresBlog";
 import MemberShipBenefits from "./MemberShipBenefits";
 import Testimonials from "./Testimonials";
 import PackagesDetails from "./PackagesDetails";
+import Banner from "../Banner";
+import NoInternetBanner from "../Banner";
 
 const HomeScreen = () => {
+ 
   return (
     <ScrollView style={styles.container}>
+     <NoInternetBanner/>
       <Text style={styles.introText}>
         Saathi provides a wide range of services to make life easier for your
         loved ones and give you peace of mind.

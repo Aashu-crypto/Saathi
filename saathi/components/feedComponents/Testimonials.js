@@ -152,15 +152,13 @@ marginTop:20
     fontSize: 20,
     fontWeight: "500",
     textAlign: "center",
+    marginVertical: 20,
     color: Color.appDefaultColor,
-    fontFamily: FontFamily.poppinsRegular,
     backgroundColor: Color.lightOrange,
     padding: 5,
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: Color.appDefaultColor,
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    marginHorizontal:10
+    marginHorizontal: 10,
   },
 });

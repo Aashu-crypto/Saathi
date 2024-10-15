@@ -29,6 +29,8 @@ const MemberShipBenefits = () => {
       text: "Safe and reliable transportation for your loved ones to appointments and events.",
     },
   ];
+
+  
   return (
     <View>
       <Text style={styles.sectionTitle}>Membership Benefits</Text>

@@ -23,6 +23,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
+import NoInternetBanner from "../../components/Banner";
 
 const ServiceSelector = () => {
   const [selectedService, setSelectedService] = useState(null);
@@ -275,6 +276,7 @@ const ServiceSelector = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Service Modal */}
+      <NoInternetBanner/>
       {modalVisible && selectedService && (
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
