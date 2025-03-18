@@ -1,10 +1,11 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Text } from "react-native";
+import { Image } from "react-native";
 import Feed from "../../screens/feed/Feed";
 import { Route } from "../../routes";
 import { Color } from "../../GlobalStyles";
 import ArticlesRead from "../../screens/feed/ArticlesRead";
+
 const FeedStack = () => {
   const Stack = createStackNavigator();
   return (
@@ -15,13 +16,12 @@ const FeedStack = () => {
         options={{
           headerShown: true,
           headerTitleAlign: "center",
-          headerTitle: "Saathi",
-          headerTitleStyle: {
-            fontFamily: "Dream-Orphans-bd",
-            color: Color.appDefaultColor,
-            letterSpacing: 2,
-            fontSize: 25,
-          },
+          headerTitle: () => (
+            <Image 
+              source={require('../../assets/imgs/headerLogo.png')}
+              style={{ width: 100, height: 40, resizeMode: 'contain' }}
+            />
+          ),
         }}
       />
       <Stack.Screen
@@ -30,13 +30,12 @@ const FeedStack = () => {
         options={{
           headerShown: true,
           headerTitleAlign: "center",
-          headerTitle: "Saathi",
-          headerTitleStyle: {
-            fontFamily: "Dream-Orphans-bd",
-            color: Color.appDefaultColor,
-            letterSpacing: 2,
-            fontSize: 25,
-          },
+          headerTitle: () => (
+            <Image 
+              source={require('../../assets/imgs/headerLogo.png')}
+              style={{ width: 100, height: 40, resizeMode: 'contain' }}
+            />
+          ),
         }}
       />
     </Stack.Navigator>

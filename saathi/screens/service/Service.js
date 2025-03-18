@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   packageServiceItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Color.lavender,
+    backgroundColor: Color.lightOrange,
     padding: 20,
     borderRadius: 15,
     marginHorizontal: 10,

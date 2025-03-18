@@ -11,7 +11,7 @@ import {
 import { useSelector } from "react-redux";
 import { FontFamily, Color } from "../../GlobalStyles";
 import { BACKEND_HOST } from "../../config";
-import { Card, Title, Paragraph, Button, Divider } from "react-native-paper";
+import { Card, Title, Paragraph, Divider } from "react-native-paper";
 import ContentLoader from "../ContentLoader";
 
 const { width } = Dimensions.get("window");
@@ -20,8 +20,11 @@ const FeedServiceTaken = () => {
   const [request, setRequest] = useState([]);
   const [feedData, setFeedData] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const profile = useSelector((state) => state.profile.data);
   const status = useSelector((state) => state.status.status);
+
+  // Helper function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -38,6 +41,7 @@ const FeedServiceTaken = () => {
     return `${day}${suffix} ${month} ${year}`;
   };
 
+  // Fetch data on mount or whenever profile/status changes
   useEffect(() => {
     const fetchData = async () => {
       if (profile?.subscriberID) {
@@ -49,11 +53,13 @@ const FeedServiceTaken = () => {
               `${BACKEND_HOST}/subscribers/${profile.subscriberID}/services`
             ),
           ]);
+
           const subscriberData = await subscriberResponse.json();
           const servicesData = await servicesResponse.json();
 
           setFeedData(subscriberData);
 
+          // Flatten the services array to a single array of interactions
           const flattenedData = servicesData.reduce((acc, service) => {
             const { serviceName, interactions } = service;
             interactions.forEach((interaction) => {
@@ -61,6 +67,7 @@ const FeedServiceTaken = () => {
             });
             return acc;
           }, []);
+
           setRequest(flattenedData);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -72,28 +79,48 @@ const FeedServiceTaken = () => {
     fetchData();
   }, [profile, status]);
 
-  const renderServiceCard = ({ item }) => (
-    <View>
+  // Render each card in the FlatList
+  const renderServiceCard = ({ item }) => {
+    return (
       <View style={styles.cardContainer}>
-        <View style={styles.cardContent}>
-          <View style={styles.header}>
-            <Text style={styles.date}>{formatDate(item.createdDate)}</Text>
+        {/* Top Section: background color, image (or placeholder), stars, and date */}
+        <View style={styles.topSection}>
+          {/* Show item.documents if valid; otherwise a placeholder image */}
+          {typeof item.documents === "string" &&
+            item.documents.trim() !== "" && (
+              <Image
+                source={{ uri: item.documents }}
+                style={styles.topImage}
+                resizeMode="contain"
+              />
+            )}
+
+          <View style={styles.topFooterRow}>
+            {/* Static 4/5 star rating to mimic the screenshot */}
+            <View style={styles.starContainer}>
+              <Text style={styles.star}>⭐</Text>
+              <Text style={styles.star}>⭐</Text>
+              <Text style={styles.star}>⭐</Text>
+              <Text style={styles.star}>⭐</Text>
+              <Text style={styles.star}>☆</Text>
+            </View>
+            <Text style={styles.dateText}>{formatDate(item.createdDate)}</Text>
           </View>
         </View>
-        {item.documents && (
-          <Image
-            source={{ uri: item.documents }}
-            style={styles.cardImage}
-            resizeMode="contain"
-          />
-        )}
-        <View style={{ padding: 10 }}>
-          <Text style={styles.description}>{item.description}</Text>
+
+        {/* Bottom Section: service name/title and description */}
+        <View style={styles.bottomSection}>
+          <Text style={styles.titleText}>
+            {item.serviceName || "Regular Check-In"}
+          </Text>
+          <Text style={styles.descriptionText}>
+            {item.description ||
+              "Write details - lorem ep sum lorem ep sum lorem ep sum..."}
+          </Text>
         </View>
       </View>
-      <Divider />
-    </View>
-  );
+    );
+  };
 
   if (loading) {
     return <ContentLoader />;
@@ -101,12 +128,14 @@ const FeedServiceTaken = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Feeds</Text> */}
       {request.length === 0 ? (
+        // If no requests, show user subscription & Saathi details
         <ScrollView style={styles.scrollContainer}>
           {feedData && (
             <>
+              {/* Optionally show the user's profile details */}
               {/* <ProfileCard feedData={feedData} /> */}
+
               <SubscriptionDetailsCard feedData={feedData} />
               {feedData.saathi && (
                 <SaathiDetailsCard saathi={feedData.saathi} />
@@ -115,19 +144,17 @@ const FeedServiceTaken = () => {
           )}
         </ScrollView>
       ) : (
-        <View style={{ marginTop: 10 }}>
-          <FlatList
-            data={request}
-            renderItem={renderServiceCard}
-            keyExtractor={(item) => item.interactionID.toString()}
-            contentContainerStyle={styles.list}
-          />
-        </View>
+        // Otherwise, show the FlatList of service interactions
+        <FlatList
+          data={request}
+          renderItem={renderServiceCard}
+          keyExtractor={(item) => item.interactionID.toString()}
+          contentContainerStyle={styles.list}
+        />
       )}
     </View>
   );
 };
-1;
 
 const ProfileCard = ({ feedData }) => (
   <Card style={styles.infoCard}>
@@ -170,8 +197,9 @@ const SaathiDetailsCard = ({ saathi }) => (
     <Card.Content>
       <Title style={styles.sectionTitle}>Saathi Details</Title>
       <View style={styles.header}>
-        {/* <Image source={{ uri: saathi.picture }} style={styles.profileImage} /> */}
-
+        {/* Example: If you have a picture for saathi, you can uncomment this:
+          <Image source={{ uri: saathi.picture }} style={styles.profileImage} />
+        */}
         <View style={styles.nameContainer}>
           <Text style={styles.name}>
             {saathi.firstName} {saathi.lastName}
@@ -180,40 +208,19 @@ const SaathiDetailsCard = ({ saathi }) => (
       </View>
       <Divider style={styles.divider} />
       <View style={styles.detailsContainer}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingVertical: 8,
-          }}
-        >
+        <View style={styles.row}>
           <Text style={styles.label}>Email:</Text>
           <Text style={styles.value}>{saathi.email}</Text>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingVertical: 8,
-          }}
-        >
+        <View style={styles.row}>
           <Text style={styles.label}>Contact:</Text>
           <Text style={styles.value}>{saathi.contactNo}</Text>
         </View>
-
         {saathi.briefBio && (
-          <>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingVertical: 8,
-              }}
-            >
-              <Text style={styles.label}>Bio:</Text>
-              <Text style={styles.value}>{saathi.briefBio}</Text>
-            </View>
-          </>
+          <View style={styles.row}>
+            <Text style={styles.label}>Bio:</Text>
+            <Text style={styles.value}>{saathi.briefBio}</Text>
+          </View>
         )}
       </View>
     </Card.Content>
@@ -223,6 +230,7 @@ const SaathiDetailsCard = ({ saathi }) => (
 export default FeedServiceTaken;
 
 const styles = StyleSheet.create({
+  /* Main container */
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
@@ -230,70 +238,107 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontFamily: FontFamily.poppinsRegular,
-    textAlign: "center",
-    color: Color.appDefaultColor,
-    marginVertical: 20,
-  },
   list: {
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
-  cardContainer: {
-    backgroundColor: Color.lightOrange,
-    borderRadius: 15,
 
-    shadowColor: "#ccc",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 4,
-    marginBottom: 15,
-    overflow: "hidden",
-    borderLeftWidth: 4,
-    borderColor: Color.appDefaultColor,
-  },
-  cardImage: {
-    width: "100%",
-    height: width * 0.4, // Responsive image height based on screen width
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
-  },
-  cardContent: {
-    padding: 15,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  serviceName: {
-    fontSize: 16,
-    fontFamily: FontFamily.poppinsBold,
-    color: Color.appDefaultColor,
-  },
-  date: {
-    fontSize: 14,
-    color: Color.colorDarkslategray,
-    fontFamily: FontFamily.poppinsRegular,
-    fontWeight: "500",
-  },
-  description: {
-    fontSize: 14,
-    color: Color.colorDarkgray,
-    marginTop: 8,
-    fontFamily: FontFamily.poppinsRegular,
-    fontWeight: "500",
-  },
-  infoCard: {
-    marginBottom: 20,
-    borderRadius: 15,
+  /* Card layout (top + bottom sections) */
+  cardContainer: {
     backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
+    // iOS shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    // Android elevation
     elevation: 3,
     overflow: "hidden",
   },
+  topSection: {
+    backgroundColor: Color.lightOrange, // e.g. "#FBE4C8"
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+  topImage: {
+    width: 60,
+    height: 60,
+    marginBottom: 12,
+  },
+  topFooterRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  starContainer: {
+    flexDirection: "row",
+  },
+  star: {
+    fontSize: 20,
+    color: "#FFA500", // star color
+    marginRight: 2,
+  },
+  dateText: {
+    fontSize: 14,
+    color: Color.colorDarkslategray,
+    fontWeight: "500",
+  },
+
+  bottomSection: {
+    padding: 16,
+  },
+  titleText: {
+    fontSize: 16,
+    fontFamily: FontFamily.poppinsBold,
+    color: Color.colorDarkslategray,
+    marginBottom: 4,
+  },
+  descriptionText: {
+    fontSize: 14,
+    fontFamily: FontFamily.poppinsRegular,
+    color: Color.colorDarkgray,
+    lineHeight: 20,
+  },
+
+  /* Cards for Subscription, Saathi, Profile, etc. */
+  infoCard: {
+    marginBottom: 20,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    elevation: 3,
+    overflow: "hidden",
+    paddingHorizontal: 4,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: FontFamily.poppinsBold,
+    color: Color.appDefaultColor,
+    marginBottom: 10,
+  },
+  divider: {
+    marginVertical: 10,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+  },
+  label: {
+    fontWeight: "bold",
+    color: Color.colorGray_100,
+    maxWidth: "45%",
+  },
+  value: {
+    color: Color.colorDarkslategray,
+    maxWidth: "55%",
+  },
+
+  /* Profile & Saathi details */
   name: {
     fontSize: 16,
     fontFamily: FontFamily.poppinsBold,
@@ -316,44 +361,17 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.poppinsRegular,
     color: Color.colorDarkgray,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontFamily: FontFamily.poppinsBold,
-    color: Color.appDefaultColor,
-    marginBottom: 10,
-  },
-  row: {
+  header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
+    alignItems: "center",
   },
-  label: {
-    fontWeight: "bold",
-    color: Color.colorGray_100,
-  },
-  value: {
-    color: Color.colorDarkslategray,
-  },
-  button: {
-    marginVertical: 20,
-    alignSelf: "center",
-    backgroundColor: Color.appDefaultColor,
-  },
-  divider: {
-    marginVertical: 10,
+  nameContainer: {
+    flex: 1,
   },
   profileImage: {
     width: width * 0.2,
     height: width * 0.2,
     borderRadius: width * 0.1,
     marginRight: 15,
-  },
-  nameContainer: {
-    flex: 1,
-  },
-  userType: {
-    fontSize: 16,
-    fontFamily: FontFamily.poppinsRegular,
-    color: Color.appDefaultColor,
   },
 });

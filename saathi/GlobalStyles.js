@@ -19,10 +19,10 @@ export const Color = {
   colorGray_100: "#848484",
   colorSilver: "#c4c4c4",
   colorGray: "#828282",
-  appDefaultColor: "#5E4DB0",
+  appDefaultColor: "#FA9A47",
   colorGrayLight: "#C4C4C4",
   colorGrayNormal: "#4C4E64",
-  lightOrange: "#F7F5FE",
-  Moccasin:"#FFD580",
-  lavender:"#F0EFFF"
+  lightOrange: "#F7E9C5",
+  Moccasin: "#FFD580",
+  lavender: "#F0EFFF",
 };

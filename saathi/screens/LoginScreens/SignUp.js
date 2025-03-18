@@ -71,6 +71,8 @@ export default function SignUp({ navigation }) {
     console.log(formData);
   
     try {
+      console.log("started");
+      
       const response = await fetch(
         `https://saathi.etheriumtech.com:444/Saathi/subscribers/register`,
         {
@@ -81,8 +83,11 @@ export default function SignUp({ navigation }) {
           body: JSON.stringify(formData),
         }
       );
+      console.log("res",response);
   
       const json = await response.json();
+      console.log("res",json);
+      
       if (response.ok) {
         dispatch(profileData(json));
         dispatch(billingStatus(json.billingStatus));

@@ -18,10 +18,9 @@ import Banner from "../Banner";
 import NoInternetBanner from "../Banner";
 
 const HomeScreen = () => {
- 
   return (
     <ScrollView style={styles.container}>
-     <NoInternetBanner/>
+      <NoInternetBanner />
       <Text style={styles.introText}>
         Saathi provides a wide range of services to make life easier for your
         loved ones and give you peace of mind.

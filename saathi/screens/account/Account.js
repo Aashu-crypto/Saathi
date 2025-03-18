@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saathiCardContainer: {
-    backgroundColor: Color.lavender,
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 12,
     shadowColor: "#000",
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     borderColor: Color.colorGray,
   },
   detailContainer: {
-    backgroundColor: Color.lavender,
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 12,
     shadowColor: "#000",

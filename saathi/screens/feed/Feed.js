@@ -51,7 +51,7 @@ const Feed = () => {
   return (
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
       <StatusBar style="dark" />
-  <HomeScreen />
+      <HomeScreen />
     </View>
   );
 };
